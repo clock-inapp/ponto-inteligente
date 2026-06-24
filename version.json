@@ -1,4 +1,4 @@
 {
-  "version": "1.9",
-  "notes": "Corrige cálculo INSS acima do teto, default HE 75% e destaque do menu"
+  "version": "1.10",
+  "notes": "Corrige horas inventadas em dias passados sem saída, atestados parciais, fuso horário na virada do dia, botões de almoço após jornada encerrada, exibição do VT na simulação e reforça proteção contra XSS no painel admin"
 }

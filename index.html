@@ -1750,7 +1750,7 @@ const TIPO_ICONS = {
 const TIPO_ORDER = ['entrada', 'saida_almoco', 'retorno_almoco', 'saida'];
 
 async function loadRegistrosHoje() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   const { data } = await db.from('registros_ponto').select('*')
     .eq('user_id', activeId()).eq('data', today).order('timestamp');
   registrosHoje = data || [];
@@ -1763,8 +1763,8 @@ function renderPonto() {
   const tipos = registrosHoje.map(r => r.tipo);
   const btns = {
     'btn-entrada': !tipos.includes('entrada'),
-    'btn-saida-almoco': tipos.includes('entrada') && !tipos.includes('saida_almoco'),
-    'btn-retorno-almoco': tipos.includes('saida_almoco') && !tipos.includes('retorno_almoco'),
+    'btn-saida-almoco': tipos.includes('entrada') && !tipos.includes('saida_almoco') && !tipos.includes('saida'),
+    'btn-retorno-almoco': tipos.includes('saida_almoco') && !tipos.includes('retorno_almoco') && !tipos.includes('saida'),
     'btn-saida': (tipos.includes('retorno_almoco') || tipos.includes('entrada')) && !tipos.includes('saida')
   };
   Object.entries(btns).forEach(([id, enabled]) => {
@@ -1795,7 +1795,7 @@ function renderPonto() {
         <div class="record-icon ${r.tipo}"><i class="fas ${TIPO_ICONS[r.tipo]}"></i></div>
         <div style="flex:1">
           <div class="record-type">${TIPO_LABELS[r.tipo]}</div>
-          ${r.observacao ? `<div class="record-note">${r.observacao}</div>` : ''}
+          ${r.observacao ? `<div class="record-note">${escapeHtml(r.observacao)}</div>` : ''}
         </div>
         <div class="record-time">${new Date(r.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
       </div>`).join('') + '</div>';
@@ -1808,7 +1808,7 @@ async function registrarPonto(tipo) {
   const obs = document.getElementById('ponto-obs').value.trim();
   const { error } = await db.from('registros_ponto').insert({
     user_id: activeId(), tipo, timestamp: now.toISOString(),
-    data: now.toISOString().split('T')[0], observacao: obs || null
+    data: localDateStr(now), observacao: obs || null
   });
   if (error) { toast('Erro ao registrar ponto: ' + error.message, 'error'); pontoBloqueado = false; return; }
   toast(TIPO_LABELS[tipo] + ' registrada com sucesso!', 'success');
@@ -1821,19 +1821,22 @@ async function registrarPonto(tipo) {
 // ═══════════════════════════════════════════════════════════
 // CÁLCULO DE HORAS
 // ═══════════════════════════════════════════════════════════
-function calcHorasDia(registros) {
+function calcHorasDia(registros, dataStr) {
   const find = tipo => registros.find(r => r.tipo === tipo);
   const entrada = find('entrada');
   const saidaAlmoco = find('saida_almoco');
   const retornoAlmoco = find('retorno_almoco');
   const saida = find('saida');
   if (!entrada) return 0;
-  const fim = saida || { timestamp: new Date().toISOString() };
+  if (saidaAlmoco && !retornoAlmoco) {
+    return Math.max(0, (new Date(saidaAlmoco.timestamp) - new Date(entrada.timestamp)) / 3600000);
+  }
+  // Sem "saída" registrada: só usa o horário atual se for o dia de hoje — dias passados não inventam horas
+  const ehHoje = !dataStr || dataStr === localDateStr();
+  const fim = saida || (ehHoje ? { timestamp: new Date().toISOString() } : (retornoAlmoco || entrada));
   let total = (new Date(fim.timestamp) - new Date(entrada.timestamp)) / 3600000;
   if (saidaAlmoco && retornoAlmoco) {
     total -= (new Date(retornoAlmoco.timestamp) - new Date(saidaAlmoco.timestamp)) / 3600000;
-  } else if (saidaAlmoco && !retornoAlmoco) {
-    total = (new Date(saidaAlmoco.timestamp) - new Date(entrada.timestamp)) / 3600000;
   }
   return Math.max(0, total);
 }
@@ -1883,7 +1886,7 @@ async function renderDashboard() {
 
   let totalHoras = 0, totalHE50 = 0, totalHE100 = 0, diasTrabalhados = 0;
   Object.entries(porDia).forEach(([data, regs]) => {
-    const h = calcHorasDia(regs);
+    const h = calcHorasDia(regs, data);
     totalHoras += h;
     const he = horasExtras(h);
     const d = new Date(data + 'T12:00:00');
@@ -1891,13 +1894,17 @@ async function renderDashboard() {
     else totalHE50 += he;
     diasTrabalhados++;
   });
-  // Dias abonados sem ponto contam como jornada normal
+  // Dias abonados sem ponto contam como jornada normal (atestado parcial soma só as horas abonadas)
   Object.keys(diasAbonados).forEach(data => {
-    if (!porDia[data]) { totalHoras += limite; diasTrabalhados++; }
+    if (!porDia[data]) {
+      const ab = diasAbonados[data];
+      totalHoras += (ab.tipo === 'atestado' && ab.horasParciais != null) ? ab.horasParciais : limite;
+      diasTrabalhados++;
+    }
   });
 
   // Registros hoje
-  const hoje = now.toISOString().split('T')[0];
+  const hoje = localDateStr(now);
   const hojeRegs = porDia[hoje] || [];
 
   // Stats
@@ -2015,8 +2022,12 @@ function getDiasAbonados(ano, mes) {
     let d = new Date(Math.max(new Date(a.data_inicio+'T12:00:00'), new Date(firstDay+'T12:00:00')));
     const end = new Date(Math.min(new Date(a.data_fim+'T12:00:00'), new Date(lastDay+'T12:00:00')));
     while (d <= end) {
-      const ds = d.toISOString().split('T')[0];
-      if (!mapa[ds]) mapa[ds] = { tipo: 'atestado', label: 'Atestado', badge: 'badge-info', icon: 'fa-file-medical' };
+      const ds = localDateStr(d);
+      if (!mapa[ds]) mapa[ds] = {
+        tipo: 'atestado', label: a.tipo === 'horas_parciais' ? 'Atestado parcial' : 'Atestado',
+        badge: 'badge-info', icon: 'fa-file-medical',
+        horasParciais: a.tipo === 'horas_parciais' ? (a.horas_abonadas || 0) : null
+      };
       d.setDate(d.getDate() + 1);
     }
   });
@@ -2050,10 +2061,11 @@ async function renderHistorico() {
   todasDatas.forEach(data => {
     const ehAbonado = diasAbonados[data] && !porDia[data];
     if (ehAbonado) {
-      totalHN += limite;
+      const ab = diasAbonados[data];
+      totalHN += (ab.tipo === 'atestado' && ab.horasParciais != null) ? ab.horasParciais : limite;
       totalDias++;
     } else if (porDia[data]) {
-      const h = calcHorasDia(porDia[data]);
+      const h = calcHorasDia(porDia[data], data);
       const he = Math.max(0, h - limite);
       totalHN += Math.min(h, limite);
       const d = new Date(data + 'T12:00:00');
@@ -2068,7 +2080,7 @@ async function renderHistorico() {
   document.getElementById('hist-dias').textContent = totalDias;
 
   // Render calendar grid — all days from 1 ascending
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = localDateStr();
   const primeroDia = new Date(histYear, histMonth - 1, 1).getDay(); // 0=Dom
   const diasAbrevs = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 
@@ -2088,7 +2100,7 @@ async function renderHistorico() {
     const ehFuturo = dataStr > hoje;
     const ehHoje = dataStr === hoje;
 
-    const h = ehAbonado ? limite : (regs.length ? calcHorasDia(regs) : 0);
+    const h = ehAbonado ? ((abonado.tipo === 'atestado' && abonado.horasParciais != null) ? abonado.horasParciais : limite) : (regs.length ? calcHorasDia(regs, dataStr) : 0);
     const he = regs.length ? horasExtras(h) : 0;
     const hasAction = regs.length > 0;
 
@@ -2204,11 +2216,11 @@ function renderSimulacao() {
   document.getElementById('sim-descontos-lista').innerHTML = `
     ${configDescontos.inss_ativo ? '<div class="sim-row"><div class="label"><span class="badge badge-danger">INSS</span></div><div class="value negative">tabela progressiva</div></div>' : ''}
     ${configDescontos.irrf_ativo ? '<div class="sim-row"><div class="label"><span class="badge badge-danger">IRRF</span></div><div class="value negative">tabela progressiva</div></div>' : ''}
-    ${configDescontos.vt_ativo && configDescontos.vt_valor ? `<div class="sim-row"><div class="label"><span class="badge badge-warning">VT</span></div><div class="value negative">${fmtBRL(configDescontos.vt_valor)}</div></div>` : ''}
+    ${configDescontos.vt_ativo && configDescontos.vt_valor ? `<div class="sim-row"><div class="label"><span class="badge badge-warning">VT</span></div><div class="value negative">${configDescontos.vt_valor}%</div></div>` : ''}
     ${configDescontos.vr_ativo && configDescontos.vr_valor ? `<div class="sim-row"><div class="label"><span class="badge badge-warning">VR</span></div><div class="value negative">${fmtBRL(configDescontos.vr_valor)}</div></div>` : ''}
     ${configDescontos.plano_saude_ativo && configDescontos.plano_saude_valor ? `<div class="sim-row"><div class="label"><span class="badge badge-info">Plano Saúde</span></div><div class="value negative">${fmtBRL(configDescontos.plano_saude_valor)}</div></div>` : ''}
     ${descontosExtras.filter(d => d.ativo).map(d => `
-      <div class="sim-row"><div class="label"><span class="badge badge-purple">${d.nome}</span></div>
+      <div class="sim-row"><div class="label"><span class="badge badge-purple">${escapeHtml(d.nome)}</span></div>
       <div class="value negative">${d.tipo === 'percentual' ? d.valor + '%' : fmtBRL(d.valor)}</div></div>`).join('')}
     ${!configDescontos.inss_ativo && !configDescontos.irrf_ativo && !descontosExtras.filter(d=>d.ativo).length ? '<div class="empty-state" style="padding:20px"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>Nenhum desconto ativo</p></div>' : ''}
   `;
@@ -2239,7 +2251,7 @@ function removerAjusteSimulacao(idx) {
 function renderAjustesSimulacao() {
   document.getElementById('sim-ajustes-lista').innerHTML = simAjustes.map((a, i) => `
     <div class="sim-row" style="padding:6px 16px">
-      <div class="label">${a.nome}</div>
+      <div class="label">${escapeHtml(a.nome)}</div>
       <div style="display:flex;align-items:center;gap:10px">
         <div class="value ${a.valor < 0 ? 'negative' : 'positive'}">${a.valor < 0 ? '- ' + fmtBRL(-a.valor) : '+ ' + fmtBRL(a.valor)}</div>
         <button class="icon-btn danger" onclick="removerAjusteSimulacao(${i})" title="Remover"><i class="fas fa-times"></i></button>
@@ -2270,12 +2282,12 @@ function calcSimulacao() {
   document.getElementById('res-vr').textContent = '- ' + fmtBRL(r.vr);
   document.getElementById('res-ps').textContent = '- ' + fmtBRL(r.planoSaude);
   document.getElementById('res-extras-list').innerHTML = r.extrasDetalhe.map(e =>
-    `<div class="sim-row"><div class="label">${e.nome}</div><div class="value negative">- ${fmtBRL(e.valor)}</div></div>`
+    `<div class="sim-row"><div class="label">${escapeHtml(e.nome)}</div><div class="value negative">- ${fmtBRL(e.valor)}</div></div>`
   ).join('');
   document.getElementById('res-total-desc').textContent = '- ' + fmtBRL(r.totalDesc);
   document.getElementById('res-ajustes-section').style.display = r.ajustesManuais.length ? '' : 'none';
   document.getElementById('res-ajustes-list').innerHTML = r.ajustesManuais.map(a =>
-    `<div class="sim-row"><div class="label">${a.nome}</div><div class="value ${a.valor < 0 ? 'negative' : 'positive'}">${a.valor < 0 ? '- ' + fmtBRL(-a.valor) : '+ ' + fmtBRL(a.valor)}</div></div>`
+    `<div class="sim-row"><div class="label">${escapeHtml(a.nome)}</div><div class="value ${a.valor < 0 ? 'negative' : 'positive'}">${a.valor < 0 ? '- ' + fmtBRL(-a.valor) : '+ ' + fmtBRL(a.valor)}</div></div>`
   ).join('');
   document.getElementById('res-ajustes-total').textContent = (r.ajustesTotal < 0 ? '- ' : '+ ') + fmtBRL(Math.abs(r.ajustesTotal));
   document.getElementById('res-liquido').textContent = fmtBRL(r.liquido);
@@ -2303,11 +2315,11 @@ async function loadHolerites() {
     <div class="holerite-card mb-4">
       <div class="holerite-icon"><i class="fas fa-file-pdf"></i></div>
       <div class="holerite-info">
-        <div class="holerite-name">${meses[h.mes]}/${h.ano} ${h.arquivo_nome ? '— ' + h.arquivo_nome : ''}</div>
+        <div class="holerite-name">${meses[h.mes]}/${h.ano} ${h.arquivo_nome ? '— ' + escapeHtml(h.arquivo_nome) : ''}</div>
         <div class="holerite-meta">
           ${h.salario_bruto ? 'Bruto: ' + fmtBRL(h.salario_bruto) : ''}
           ${h.salario_liquido ? ' · Líquido: ' + fmtBRL(h.salario_liquido) : ''}
-          ${h.observacoes ? ' · ' + h.observacoes : ''}
+          ${h.observacoes ? ' · ' + escapeHtml(h.observacoes) : ''}
         </div>
       </div>
       <div class="holerite-actions">
@@ -2480,7 +2492,7 @@ function renderExtrasLista() {
   container.innerHTML = descontosExtras.map(d => `
     <div class="discount-item">
       <label class="toggle" style="margin-right:4px"><input type="checkbox" ${d.ativo ? 'checked' : ''} onchange="toggleDesconto('${d.id}',this.checked)"><span class="toggle-slider"></span></label>
-      <span class="name">${d.nome}</span>
+      <span class="name">${escapeHtml(d.nome)}</span>
       <span class="tipo">${d.tipo === 'percentual' ? '%' : 'R$'}</span>
       <span class="valor">${d.tipo === 'percentual' ? d.valor + '%' : fmtBRL(d.valor)}</span>
       <button class="icon-btn danger" onclick="confirmarDelDescontoModal('${d.id}')"><i class="fas fa-trash"></i></button>
@@ -2523,6 +2535,15 @@ function fmtBRL(v) {
   return 'R$ ' + (v || 0).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
+// Data local (AAAA-MM-DD) — evita o desvio de toISOString() em fuso UTC-3 à noite
+function localDateStr(d = new Date()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // ═══════════════════════════════════════════════════════════
 // DIAS JUSTIFICADOS (feriados, DSR, folgas)
 // ═══════════════════════════════════════════════════════════
@@ -2532,7 +2553,7 @@ async function loadDiasJustificados() {
 }
 
 function abrirMarcadorEspecial() {
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = localDateStr();
   document.getElementById('esp-data').value = hoje;
   document.getElementById('esp-obs').value = '';
   openModal('modal-dia-especial');
@@ -2567,7 +2588,7 @@ async function deletarDiaEspecial(id) {
 // LANÇAMENTO MANUAL
 // ═══════════════════════════════════════════════════════════
 function abrirLancamentoManual() {
-  const hoje = new Date().toISOString().split('T')[0];
+  const hoje = localDateStr();
   document.getElementById('lanc-data').value = hoje;
   document.getElementById('lanc-entrada').value = perfil.horario_entrada || '08:00';
   document.getElementById('lanc-saida-almoco').value = '';
@@ -2656,7 +2677,7 @@ function abrirHoleriteDemonstrativo() {
   const now = new Date();
   const r = calcSalario(salOverride ? +salOverride : null, he50h, he100h, now.getFullYear(), now.getMonth() + 1, simAjustes);
   const salBase = salOverride ? +salOverride : (perfil.salario_base || 0);
-  const nome = perfil.nome || 'Funcionário';
+  const nome = escapeHtml(perfil.nome || 'Funcionário');
   const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const periodo = `${meses[now.getMonth()]}/${now.getFullYear()}`;
   const chMensal = perfil.carga_horaria_mensal || 220;
@@ -2671,8 +2692,8 @@ function abrirHoleriteDemonstrativo() {
     r.vt > 0 ? [`Vale Transporte (${configDescontos.vt_valor || 0}% do bruto)`, fmtBRL(r.vt), 'desconto'] : null,
     r.vr > 0 ? ['Vale Refeição', fmtBRL(r.vr), 'desconto'] : null,
     r.planoSaude > 0 ? ['Plano de Saúde', fmtBRL(r.planoSaude), 'desconto'] : null,
-    ...r.extrasDetalhe.map(e => [e.nome, fmtBRL(e.valor), 'desconto']),
-    ...r.ajustesManuais.map(a => [a.nome, fmtBRL(Math.abs(a.valor)), a.valor < 0 ? 'desconto' : 'provento']),
+    ...r.extrasDetalhe.map(e => [escapeHtml(e.nome), fmtBRL(e.valor), 'desconto']),
+    ...r.ajustesManuais.map(a => [escapeHtml(a.nome), fmtBRL(Math.abs(a.valor)), a.valor < 0 ? 'desconto' : 'provento']),
   ].filter(Boolean);
 
   const proventos = linhas.filter(l => l[2] === 'provento');
@@ -2751,7 +2772,7 @@ async function renderAtestados() {
       tipoSel.value === 'horas_parciais' ? '' : 'none';
   };
   // set today as default dates
-  const today = new Date().toISOString().split('T')[0];
+  const today = localDateStr();
   document.getElementById('atst-inicio').value = today;
   document.getElementById('atst-fim').value = today;
   renderAtestadosList();
@@ -2776,7 +2797,7 @@ function renderAtestadosList() {
           <div class="atestado-title">${a.tipo === 'dia_completo' ? 'Dia completo' : 'Horas parciais'} — ${periodo}</div>
           <div class="atestado-meta">
             ${a.horas_abonadas ? a.horas_abonadas + 'h abonadas · ' : ''}
-            ${a.observacao || ''}
+            ${escapeHtml(a.observacao || '')}
           </div>
         </div>
         <button class="icon-btn danger" onclick="confirmarDelAtestadoModal('${a.id}')"><i class="fas fa-trash"></i></button>
@@ -2973,8 +2994,8 @@ function renderAdminList(users) {
   const list = document.getElementById('admin-users-list');
   if (!users.length) { list.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>Nenhum usuário encontrado</p></div>'; return; }
   list.innerHTML = users.map(u => {
-    const nome = u.nome || '(sem nome)';
-    const email = u.email || '—';
+    const nome = escapeHtml(u.nome || '(sem nome)');
+    const email = escapeHtml(u.email || '—');
     const desde = u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : '—';
     const sal = u.salario_base ? fmtBRL(u.salario_base) : 'Não configurado';
     const isMe = u.id === currentUser.id;
