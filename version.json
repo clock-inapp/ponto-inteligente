@@ -1,4 +1,4 @@
 {
-  "version": "1.7",
-  "notes": "Reflexo de horas extras no DSR e variáveis manuais (+/-) na Simulação"
+  "version": "1.9",
+  "notes": "Corrige cálculo INSS acima do teto, default HE 75% e destaque do menu"
 }
