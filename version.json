@@ -1,4 +1,4 @@
 {
-  "version": "1.10",
-  "notes": "Corrige horas inventadas em dias passados sem saída, atestados parciais, fuso horário na virada do dia, botões de almoço após jornada encerrada, exibição do VT na simulação e reforça proteção contra XSS no painel admin"
+  "version": "1.11",
+  "notes": "Adiciona adicional noturno (22h-5h), estimativa de 13º e férias +1/3, lembretes de ponto, gráfico de horas no dashboard e exportação de dados (backup JSON)"
 }

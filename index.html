@@ -515,6 +515,18 @@
   @media (max-width: 960px) {
     body.admin-view-mode .main { padding-top: calc(56px + 36px) !important; }
   }
+  /* ───── GRÁFICO DE HORAS ───── */
+  .graf-legenda { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; font-size: 11px;
+    color: var(--text-muted); padding: 2px 2px 12px; }
+  .graf-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; vertical-align: middle; margin-right: 3px; }
+  .graf-wrap { position: relative; display: flex; align-items: flex-end; gap: 3px; height: 140px;
+    overflow-x: auto; padding: 6px 2px 0; }
+  .graf-col { flex: 1 0 14px; min-width: 14px; display: flex; flex-direction: column; align-items: center; height: 100%; }
+  .graf-bar-wrap { flex: 1; width: 100%; display: flex; align-items: flex-end; }
+  .graf-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 0; transition: height .3s ease; }
+  .graf-dia { font-size: 9px; color: var(--text-dim); margin-top: 4px; }
+  .graf-dia.hoje { color: var(--primary-light); font-weight: 800; }
+  .graf-meta-line { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--warning); opacity: .55; pointer-events: none; }
 </style>
 </head>
 <body>
@@ -726,6 +738,15 @@
           </div>
         </div>
 
+        <div class="card mb-6">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-chart-column" style="color:var(--primary)"></i> Horas por dia (mês atual)</span>
+          </div>
+          <div id="dash-grafico">
+            <div class="loader"><div class="spinner"></div></div>
+          </div>
+        </div>
+
         <div class="card">
           <div class="card-header">
             <span class="card-title"><i class="fas fa-receipt" style="color:var(--primary)"></i> Resumo financeiro do mês</span>
@@ -827,6 +848,10 @@
                 <input type="range" id="sim-he100" min="0" max="40" value="0" oninput="calcSimulacao()">
               </div>
               <div class="slider-group">
+                <div class="slider-label">Horas Noturnas (22h–5h) <span id="sim-noturnas-val">0h</span></div>
+                <input type="range" id="sim-noturnas" min="0" max="120" value="0" oninput="calcSimulacao()">
+              </div>
+              <div class="slider-group">
                 <div class="slider-label">Dias Trabalhados <span id="sim-dias-val">22</span></div>
                 <input type="range" id="sim-dias" min="0" max="31" value="22" oninput="calcSimulacao()">
               </div>
@@ -855,6 +880,24 @@
                 <div id="sim-ajustes-lista"></div>
               </div>
             </div>
+            <div class="card mt-4">
+              <div class="card-header">
+                <span class="card-title"><i class="fas fa-gift" style="color:var(--success)"></i> 13º salário e Férias</span>
+              </div>
+              <div class="slider-group">
+                <div class="slider-label">Meses trabalhados no ano <span id="sim-meses-trab-val">0 meses</span></div>
+                <input type="range" id="sim-meses-trab" min="0" max="12" value="0" oninput="this.dataset.touched='1';render13Ferias()">
+              </div>
+              <div class="sim-section" style="margin-top:4px">
+                <div class="sim-row"><div class="label">13º proporcional</div><div class="value positive" id="res-13">R$ 0,00</div></div>
+                <div class="sim-row"><div class="label">Férias proporcionais</div><div class="value positive" id="res-ferias-base">R$ 0,00</div></div>
+                <div class="sim-row"><div class="label">+ 1/3 constitucional</div><div class="value positive" id="res-ferias-terco">R$ 0,00</div></div>
+                <div class="sim-row" style="font-weight:700"><div class="label">Total de férias</div><div class="value positive" id="res-ferias-total">R$ 0,00</div></div>
+              </div>
+              <div style="font-size:11px;color:var(--text-dim);padding:4px 16px 12px">
+                * Estimativa bruta proporcional aos avos (meses/12) sobre o salário base. INSS/IRRF ainda incidem sobre o 13º.
+              </div>
+            </div>
           </div>
           <!-- Resultado -->
           <div class="card">
@@ -866,6 +909,7 @@
               <div class="sim-row"><div class="label">Salário base</div><div class="value positive" id="res-salario">R$ 0,00</div></div>
               <div class="sim-row"><div class="label">HE 75% (<span id="res-he50-h">0h</span>)</div><div class="value positive" id="res-he50">R$ 0,00</div></div>
               <div class="sim-row"><div class="label">HE 100% (<span id="res-he100-h">0h</span>)</div><div class="value positive" id="res-he100">R$ 0,00</div></div>
+              <div class="sim-row"><div class="label">Adicional noturno (<span id="res-noturnas-h">0h</span>)</div><div class="value positive" id="res-noturnas">R$ 0,00</div></div>
               <div class="sim-row"><div class="label">Reflexo DSR sobre HE</div><div class="value positive" id="res-dsr">R$ 0,00</div></div>
               <div class="sim-row" style="font-weight:700"><div class="label">Salário Bruto</div><div class="value" id="res-bruto">R$ 0,00</div></div>
             </div>
@@ -1179,6 +1223,42 @@
                   <i class="fas fa-plus"></i> Adicionar desconto
                 </button>
               </div>
+            </div>
+
+            <!-- Adicional noturno -->
+            <div class="settings-section mt-4">
+              <h3><i class="fas fa-moon"></i> Adicional Noturno</h3>
+              <div class="toggle-row">
+                <div class="info"><span>Calcular adicional noturno</span><small>Horas entre 22h e 5h (CLT art. 73)</small></div>
+                <div style="display:flex;align-items:center;gap:4px;margin:0 10px">
+                  <input type="number" class="form-control" id="cfg-noturno-val" style="width:70px;margin:0" min="0" max="100" step="1" placeholder="20">
+                  <span style="color:var(--text-muted);font-size:14px;font-weight:600">%</span>
+                </div>
+                <label class="toggle"><input type="checkbox" id="cfg-noturno" checked onchange="salvarAdicNoturno()"><span class="toggle-slider"></span></label>
+              </div>
+              <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:6px">As horas noturnas são calculadas automaticamente a partir dos seus registros de ponto. Preferência salva neste navegador.</small>
+              <button class="btn btn-secondary mt-4" style="font-size:13px;padding:10px" onclick="salvarAdicNoturno()">
+                <i class="fas fa-save"></i> Salvar adicional noturno
+              </button>
+            </div>
+
+            <!-- Lembretes de ponto -->
+            <div class="settings-section mt-4">
+              <h3><i class="fas fa-bell"></i> Lembretes de Ponto</h3>
+              <div class="toggle-row">
+                <div class="info"><span>Notificar nos horários</span><small>Avisa na entrada e na saída padrão</small></div>
+                <label class="toggle"><input type="checkbox" id="cfg-lembretes" onchange="toggleReminders(this.checked)"><span class="toggle-slider"></span></label>
+              </div>
+              <small style="color:var(--text-muted);font-size:11px;display:block;margin-top:6px">Usa notificações locais do navegador. Funciona enquanto o app estiver aberto (aba ou app instalado). Nenhum dado sai do seu dispositivo.</small>
+            </div>
+
+            <!-- Backup / exportar -->
+            <div class="settings-section mt-4">
+              <h3><i class="fas fa-download"></i> Meus Dados</h3>
+              <small style="color:var(--text-muted);font-size:12px;display:block;margin-bottom:12px">Baixe uma cópia de tudo (perfil, pontos, atestados, dias especiais, descontos e holerites) em um arquivo JSON — sua rede de segurança.</small>
+              <button class="btn btn-secondary" id="btn-exportar" style="font-size:13px;padding:10px" onclick="exportarDados()">
+                <i class="fas fa-file-export"></i> Exportar meus dados (JSON)
+              </button>
             </div>
           </div>
         </div>
@@ -1580,6 +1660,7 @@ function showApp() {
   document.getElementById('app').style.display = 'block';
   updateUserUI();
   navigate('dashboard');
+  if (remindersOn()) scheduleReminders();
 }
 
 async function loadUserData() {
@@ -1673,6 +1754,7 @@ async function doAppleLogin() {
 
 async function doLogout() {
   await db.auth.signOut();
+  clearReminders();
   currentUser = null; perfil = {}; configDescontos = {}; descontosExtras = []; registrosHoje = []; isAdmin = false;
   viewingAsUser = null; _savedPerfil = null; _savedConfig = null; _savedExtras = null;
   document.getElementById('nav-admin').style.display = 'none';
@@ -1884,10 +1966,11 @@ async function renderDashboard() {
   const diasAbonados = getDiasAbonados(ano, mes);
   const limite = perfil.carga_horaria_diaria || 7.33;
 
-  let totalHoras = 0, totalHE50 = 0, totalHE100 = 0, diasTrabalhados = 0;
+  let totalHoras = 0, totalHE50 = 0, totalHE100 = 0, totalNoturnas = 0, diasTrabalhados = 0;
   Object.entries(porDia).forEach(([data, regs]) => {
     const h = calcHorasDia(regs, data);
     totalHoras += h;
+    totalNoturnas += calcHorasNoturnas(regs, data);
     const he = horasExtras(h);
     const d = new Date(data + 'T12:00:00');
     if (d.getDay() === 0) totalHE100 += he;
@@ -1943,8 +2026,11 @@ async function renderDashboard() {
   document.getElementById('prog-he-bar').style.width = Math.min(100, ((totalHE50 + totalHE100) / metaHE) * 100) + '%';
   document.getElementById('dash-dias-sub').textContent = `de ${diasUteisNoMes} dias úteis`;
 
+  // Gráfico de horas do mês
+  renderGraficoHoras(porDia, diasAbonados, ano, mes, ultimoDia, limite);
+
   // Salário estimado
-  const sim = calcSalario(null, totalHE50, totalHE100, ano, mes);
+  const sim = calcSalario(null, totalHE50, totalHE100, ano, mes, [], totalNoturnas);
   document.getElementById('dash-liquido').textContent = fmtBRL(sim.liquido);
 
   // Resumo financeiro
@@ -1960,6 +2046,7 @@ async function renderDashboard() {
         ['Extras', -sim.extras, 'negative'],
         ['HE 75% ('+formatHoras(totalHE50)+')', sim.valorHE50, 'positive'],
         ['HE 100% ('+formatHoras(totalHE100)+')', sim.valorHE100, 'positive'],
+        ['Adicional noturno ('+formatHoras(totalNoturnas)+')', sim.valorAdicNoturno, 'positive'],
         ['Reflexo DSR sobre HE', sim.dsrReflexo, 'positive'],
       ].map(([l, v, cls]) => v !== 0 && v !== -0 ? `
         <div class="sim-row"><div class="label">${l}</div><div class="value ${cls}">${v < 0 ? '- ' + fmtBRL(-v) : fmtBRL(v)}</div></div>
@@ -2174,7 +2261,7 @@ function calcIRRF(brutoLiquidoINSS) {
   return 0;
 }
 
-function calcSalario(salarioOverride = null, he50h = 0, he100h = 0, ano = null, mes = null, ajustesManuais = []) {
+function calcSalario(salarioOverride = null, he50h = 0, he100h = 0, ano = null, mes = null, ajustesManuais = [], noturnasH = 0) {
   const now = new Date();
   const anoCalc = ano || now.getFullYear();
   const mesCalc = mes || (now.getMonth() + 1);
@@ -2185,11 +2272,15 @@ function calcSalario(salarioOverride = null, he50h = 0, he100h = 0, ano = null, 
   const valorHora = chMensal > 0 ? salBase / chMensal : 0;
   const valorHE50 = he50h * valorHora * (1 + pHE50);
   const valorHE100 = he100h * valorHora * (1 + pHE100);
+  // Adicional noturno (CLT art. 73): +% sobre a hora, para horas trabalhadas entre 22h e 5h
+  const adicNoturnoCfg = getAdicNoturnoCfg();
+  const pNoturno = adicNoturnoCfg.ativo ? ((adicNoturnoCfg.pct || 0) / 100) : 0;
+  const valorAdicNoturno = (noturnasH || 0) * valorHora * pNoturno;
   // Reflexo de Horas Extras no DSR (Lei 605/49): HE em R$ no mês ÷ dias úteis × (domingos + feriados)
   const diasUteisMes = getDiasUteisNoMes(anoCalc, mesCalc);
   const domingosFeriadosMes = getDomingosEFeriadosNoMes(anoCalc, mesCalc);
   const dsrReflexo = diasUteisMes > 0 ? ((valorHE50 + valorHE100) / diasUteisMes) * domingosFeriadosMes : 0;
-  const bruto = salBase + valorHE50 + valorHE100 + dsrReflexo;
+  const bruto = salBase + valorHE50 + valorHE100 + valorAdicNoturno + dsrReflexo;
   const inss = calcINSS(bruto);
   const irrf = calcIRRF(bruto - inss);
   const vtPct = configDescontos.vt_ativo ? (configDescontos.vt_valor || 0) : 0;
@@ -2205,7 +2296,7 @@ function calcSalario(salarioOverride = null, he50h = 0, he100h = 0, ano = null, 
   const totalDesc = inss + irrf + vt + vr + planoSaude + extras;
   const ajustesTotal = (ajustesManuais || []).reduce((s, a) => s + a.valor, 0);
   const liquido = Math.max(0, bruto - totalDesc + ajustesTotal);
-  return { bruto, inss, irrf, vt, vr, planoSaude, extras, extrasDetalhe, totalDesc, liquido, valorHE50, valorHE100, valorHora, dsrReflexo, ajustesManuais, ajustesTotal };
+  return { bruto, inss, irrf, vt, vr, planoSaude, extras, extrasDetalhe, totalDesc, liquido, valorHE50, valorHE100, valorAdicNoturno, noturnasH: noturnasH || 0, pNoturno, valorHora, dsrReflexo, ajustesManuais, ajustesTotal };
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2224,6 +2315,9 @@ function renderSimulacao() {
       <div class="value negative">${d.tipo === 'percentual' ? d.valor + '%' : fmtBRL(d.valor)}</div></div>`).join('')}
     ${!configDescontos.inss_ativo && !configDescontos.irrf_ativo && !descontosExtras.filter(d=>d.ativo).length ? '<div class="empty-state" style="padding:20px"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>Nenhum desconto ativo</p></div>' : ''}
   `;
+  // 13º/férias: default = meses decorridos no ano
+  const mesesEl = document.getElementById('sim-meses-trab');
+  if (mesesEl && !mesesEl.dataset.touched) mesesEl.value = new Date().getMonth() + 1;
   renderAjustesSimulacao();
   calcSimulacao();
 }
@@ -2263,17 +2357,21 @@ function calcSimulacao() {
   const now = new Date();
   const he50h = +document.getElementById('sim-he50').value;
   const he100h = +document.getElementById('sim-he100').value;
+  const noturnasH = +document.getElementById('sim-noturnas').value;
   const diasVal = +document.getElementById('sim-dias').value;
   const salOverride = document.getElementById('sim-salario-override').value;
   document.getElementById('sim-he50-val').textContent = he50h + 'h';
   document.getElementById('sim-he100-val').textContent = he100h + 'h';
+  document.getElementById('sim-noturnas-val').textContent = noturnasH + 'h';
   document.getElementById('sim-dias-val').textContent = diasVal;
-  const r = calcSalario(salOverride ? +salOverride : null, he50h, he100h, now.getFullYear(), now.getMonth() + 1, simAjustes);
-  document.getElementById('res-salario').textContent = fmtBRL(r.bruto - r.valorHE50 - r.valorHE100 - r.dsrReflexo);
+  const r = calcSalario(salOverride ? +salOverride : null, he50h, he100h, now.getFullYear(), now.getMonth() + 1, simAjustes, noturnasH);
+  document.getElementById('res-salario').textContent = fmtBRL(r.bruto - r.valorHE50 - r.valorHE100 - r.valorAdicNoturno - r.dsrReflexo);
   document.getElementById('res-he50-h').textContent = he50h + 'h';
   document.getElementById('res-he50').textContent = fmtBRL(r.valorHE50);
   document.getElementById('res-he100-h').textContent = he100h + 'h';
   document.getElementById('res-he100').textContent = fmtBRL(r.valorHE100);
+  document.getElementById('res-noturnas-h').textContent = formatHoras(r.noturnasH);
+  document.getElementById('res-noturnas').textContent = fmtBRL(r.valorAdicNoturno);
   document.getElementById('res-dsr').textContent = fmtBRL(r.dsrReflexo);
   document.getElementById('res-bruto').textContent = fmtBRL(r.bruto);
   document.getElementById('res-inss').textContent = '- ' + fmtBRL(r.inss);
@@ -2291,6 +2389,7 @@ function calcSimulacao() {
   ).join('');
   document.getElementById('res-ajustes-total').textContent = (r.ajustesTotal < 0 ? '- ' : '+ ') + fmtBRL(Math.abs(r.ajustesTotal));
   document.getElementById('res-liquido').textContent = fmtBRL(r.liquido);
+  render13Ferias();
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2424,7 +2523,20 @@ function renderConfiguracoes() {
   document.getElementById('cfg-vr-val').value = configDescontos.vr_valor || '';
   document.getElementById('cfg-ps').checked = configDescontos.plano_saude_ativo !== false;
   document.getElementById('cfg-ps-val').value = configDescontos.plano_saude_valor || '';
+  const anCfg = getAdicNoturnoCfg();
+  document.getElementById('cfg-noturno').checked = anCfg.ativo;
+  document.getElementById('cfg-noturno-val').value = anCfg.pct;
+  document.getElementById('cfg-lembretes').checked = remindersOn();
   renderExtrasLista();
+}
+
+function salvarAdicNoturno() {
+  const ativo = document.getElementById('cfg-noturno').checked;
+  let pct = +document.getElementById('cfg-noturno-val').value;
+  if (!(pct > 0)) pct = 20;
+  setAdicNoturnoCfg({ ativo, pct });
+  document.getElementById('cfg-noturno-val').value = pct;
+  toast('Adicional noturno salvo!', 'success');
 }
 
 async function salvarPerfil() {
@@ -2542,6 +2654,226 @@ function localDateStr(d = new Date()) {
 
 function escapeHtml(str) {
   return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ═══════════════════════════════════════════════════════════
+// ADICIONAL NOTURNO (22h–05h · +20% por padrão · CLT art. 73)
+// Preferência local (por navegador) — não exige alteração no banco.
+// ═══════════════════════════════════════════════════════════
+function getAdicNoturnoCfg() {
+  try {
+    const raw = localStorage.getItem('clockin_adic_noturno');
+    if (raw) { const c = JSON.parse(raw); return { ativo: c.ativo !== false, pct: c.pct != null ? +c.pct : 20 }; }
+  } catch {}
+  return { ativo: true, pct: 20 };
+}
+function setAdicNoturnoCfg(cfg) { try { localStorage.setItem('clockin_adic_noturno', JSON.stringify(cfg)); } catch {} }
+
+// Reconstrói os intervalos efetivamente trabalhados de um dia a partir dos registros
+function workedIntervals(registros, dataStr) {
+  const find = t => registros.find(r => r.tipo === t);
+  const entrada = find('entrada');
+  const saidaAlmoco = find('saida_almoco');
+  const retornoAlmoco = find('retorno_almoco');
+  const saida = find('saida');
+  if (!entrada) return [];
+  const ehHoje = !dataStr || dataStr === localDateStr();
+  const agora = { timestamp: new Date().toISOString() };
+  const ints = [];
+  if (saidaAlmoco) {
+    ints.push([new Date(entrada.timestamp), new Date(saidaAlmoco.timestamp)]);
+    if (retornoAlmoco) {
+      const fim = saida || (ehHoje ? agora : retornoAlmoco);
+      ints.push([new Date(retornoAlmoco.timestamp), new Date(fim.timestamp)]);
+    }
+  } else {
+    const fim = saida || (ehHoje ? agora : entrada);
+    ints.push([new Date(entrada.timestamp), new Date(fim.timestamp)]);
+  }
+  return ints.filter(([a, b]) => b > a);
+}
+
+function _overlapMs(aS, aE, bS, bE) { return Math.max(0, Math.min(aE, bE) - Math.max(aS, bS)); }
+
+// Horas de um intervalo que caem na faixa noturna (22h–24h ∪ 00h–05h)
+function nightOverlapHours(start, end) {
+  let ms = 0;
+  const d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+  const last = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+  while (d <= last) {
+    const y = d.getFullYear(), mo = d.getMonth(), da = d.getDate();
+    ms += _overlapMs(start, end, new Date(y, mo, da, 0, 0, 0), new Date(y, mo, da, 5, 0, 0));
+    ms += _overlapMs(start, end, new Date(y, mo, da, 22, 0, 0), new Date(y, mo, da + 1, 0, 0, 0));
+    d.setDate(d.getDate() + 1);
+  }
+  return ms / 3600000;
+}
+
+function calcHorasNoturnas(registros, dataStr) {
+  return workedIntervals(registros, dataStr).reduce((s, [a, b]) => s + nightOverlapHours(a, b), 0);
+}
+
+// ═══════════════════════════════════════════════════════════
+// LEMBRETES DE PONTO (notificação local — funciona com o app aberto)
+// ═══════════════════════════════════════════════════════════
+let reminderTimers = [];
+function remindersOn() { try { return localStorage.getItem('clockin_reminders') === '1'; } catch { return false; } }
+function setRemindersOn(v) { try { localStorage.setItem('clockin_reminders', v ? '1' : '0'); } catch {} }
+function clearReminders() { reminderTimers.forEach(t => clearTimeout(t)); reminderTimers = []; }
+
+async function toggleReminders(on) {
+  const chk = document.getElementById('cfg-lembretes');
+  if (on) {
+    if (!('Notification' in window)) { toast('Notificações não são suportadas neste navegador', 'error'); if (chk) chk.checked = false; return; }
+    let perm = Notification.permission;
+    if (perm === 'default') { try { perm = await Notification.requestPermission(); } catch { perm = 'denied'; } }
+    if (perm !== 'granted') { toast('Permissão de notificação negada', 'warning'); if (chk) chk.checked = false; setRemindersOn(false); return; }
+    setRemindersOn(true);
+    scheduleReminders();
+    toast('Lembretes de ponto ativados!', 'success');
+  } else {
+    setRemindersOn(false);
+    clearReminders();
+    toast('Lembretes desativados', 'info');
+  }
+}
+
+function scheduleReminders() {
+  clearReminders();
+  if (!remindersOn() || !('Notification' in window) || Notification.permission !== 'granted') return;
+  const now = new Date();
+  const plano = [
+    { time: perfil.horario_entrada || '08:00', msg: 'Hora de registrar sua ENTRADA 🕗' },
+    { time: perfil.horario_saida || '17:00', msg: 'Hora de registrar sua SAÍDA 🕔' },
+  ];
+  plano.forEach(p => {
+    if (!p.time) return;
+    const [h, m] = p.time.split(':').map(Number);
+    const quando = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0);
+    const delay = quando - now;
+    if (delay > 0 && delay < 24 * 3600000) {
+      reminderTimers.push(setTimeout(() => {
+        try { new Notification('ClockIn', { body: p.msg, icon: './icon.svg' }); } catch {}
+      }, delay));
+    }
+  });
+  // Reagenda logo após a meia-noite para o dia seguinte
+  const amanha = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 1, 0);
+  reminderTimers.push(setTimeout(scheduleReminders, Math.max(1000, amanha - now)));
+}
+
+// ═══════════════════════════════════════════════════════════
+// 13º SALÁRIO E FÉRIAS (+1/3) — estimativa proporcional
+// ═══════════════════════════════════════════════════════════
+function render13Ferias() {
+  const mesesEl = document.getElementById('sim-meses-trab');
+  if (!mesesEl) return;
+  const meses = Math.max(0, Math.min(12, +mesesEl.value || 0));
+  document.getElementById('sim-meses-trab-val').textContent = meses + (meses === 1 ? ' mês' : ' meses');
+  const salOverride = document.getElementById('sim-salario-override').value;
+  const salBase = salOverride ? +salOverride : (perfil.salario_base || 0);
+  const decimoTerceiro = salBase / 12 * meses;
+  const feriasBase = salBase / 12 * meses; // proporcional aos meses (avos)
+  const tercoFerias = feriasBase / 3;
+  const feriasTotal = feriasBase + tercoFerias;
+  document.getElementById('res-13').textContent = fmtBRL(decimoTerceiro);
+  document.getElementById('res-ferias-base').textContent = fmtBRL(feriasBase);
+  document.getElementById('res-ferias-terco').textContent = fmtBRL(tercoFerias);
+  document.getElementById('res-ferias-total').textContent = fmtBRL(feriasTotal);
+}
+
+// ═══════════════════════════════════════════════════════════
+// GRÁFICO DE HORAS DO MÊS (barras — horas por dia)
+// ═══════════════════════════════════════════════════════════
+function renderGraficoHoras(porDia, diasAbonados, ano, mes, ultimoDia, limite) {
+  const el = document.getElementById('dash-grafico');
+  if (!el) return;
+  const hojeStr = localDateStr();
+  let maxH = limite;
+  const dias = [];
+  for (let dia = 1; dia <= ultimoDia; dia++) {
+    const ds = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+    const regs = porDia[ds];
+    const ab = diasAbonados[ds];
+    let h = 0, tipo = 'vazio';
+    if (regs && regs.length) { h = calcHorasDia(regs, ds); tipo = 'trab'; }
+    else if (ab) { h = (ab.tipo === 'atestado' && ab.horasParciais != null) ? ab.horasParciais : limite; tipo = 'abon'; }
+    if (h > maxH) maxH = h;
+    dias.push({ dia, h, tipo, futuro: ds > hojeStr, hoje: ds === hojeStr });
+  }
+  const barras = dias.map(d => {
+    const pct = maxH > 0 ? Math.round((d.h / maxH) * 100) : 0;
+    let cor = 'var(--border)';
+    if (d.tipo === 'trab') cor = d.h >= limite ? 'var(--success)' : 'var(--warning)';
+    else if (d.tipo === 'abon') cor = 'var(--info)';
+    const title = d.h > 0 ? `Dia ${d.dia}: ${formatHoras(d.h)}` : `Dia ${d.dia}: sem registro`;
+    return `<div class="graf-col" title="${title}">
+      <div class="graf-bar-wrap">
+        <div class="graf-bar" style="height:${Math.max(pct, d.h > 0 ? 4 : 0)}%;background:${cor}"></div>
+      </div>
+      <div class="graf-dia${d.hoje ? ' hoje' : ''}">${d.dia}</div>
+    </div>`;
+  }).join('');
+  el.innerHTML = `
+    <div class="graf-legenda">
+      <span><i class="graf-dot" style="background:var(--success)"></i> Meta cumprida</span>
+      <span><i class="graf-dot" style="background:var(--warning)"></i> Parcial</span>
+      <span><i class="graf-dot" style="background:var(--info)"></i> Abonado</span>
+      <span style="margin-left:auto;color:var(--text-dim)">Linha = ${formatHoras(limite)}/dia</span>
+    </div>
+    <div class="graf-wrap">
+      <div class="graf-meta-line" style="bottom:${maxH > 0 ? (limite / maxH) * 100 : 0}%"></div>
+      ${barras}
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORTAR DADOS (backup JSON)
+// ═══════════════════════════════════════════════════════════
+async function exportarDados() {
+  const btn = document.getElementById('btn-exportar');
+  if (btn) { btn.disabled = true; }
+  toast('Preparando backup...', 'info');
+  try {
+    const uid = activeId();
+    const [perfilR, cfgR, extrasR, regR, justR, atstR, holR] = await Promise.all([
+      db.from('perfis').select('*').eq('id', uid).single(),
+      db.from('config_descontos').select('*').eq('user_id', uid).single(),
+      db.from('descontos_extras').select('*').eq('user_id', uid),
+      db.from('registros_ponto').select('*').eq('user_id', uid),
+      db.from('dias_justificados').select('*').eq('user_id', uid),
+      db.from('atestados_medicos').select('*').eq('user_id', uid),
+      db.from('holerites').select('*').eq('user_id', uid),
+    ]);
+    const backup = {
+      app: 'ClockIn',
+      versao_backup: 1,
+      exportado_em: new Date().toISOString(),
+      usuario: { id: uid, email: currentUser ? currentUser.email : null },
+      perfil: perfilR.data || null,
+      config_descontos: cfgR.data || null,
+      descontos_extras: extrasR.data || [],
+      registros_ponto: regR.data || [],
+      dias_justificados: justR.data || [],
+      atestados_medicos: atstR.data || [],
+      holerites: holR.data || [],
+      preferencias_locais: { adicional_noturno: getAdicNoturnoCfg(), lembretes: remindersOn() }
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `clockin-backup-${localDateStr()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast('Backup exportado com sucesso!', 'success');
+  } catch (e) {
+    toast('Erro ao exportar: ' + (e.message || e), 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2673,9 +3005,10 @@ function toggleCalcInfo() {
 function abrirHoleriteDemonstrativo() {
   const he50h = +document.getElementById('sim-he50').value;
   const he100h = +document.getElementById('sim-he100').value;
+  const noturnasH = +document.getElementById('sim-noturnas').value;
   const salOverride = document.getElementById('sim-salario-override').value;
   const now = new Date();
-  const r = calcSalario(salOverride ? +salOverride : null, he50h, he100h, now.getFullYear(), now.getMonth() + 1, simAjustes);
+  const r = calcSalario(salOverride ? +salOverride : null, he50h, he100h, now.getFullYear(), now.getMonth() + 1, simAjustes, noturnasH);
   const salBase = salOverride ? +salOverride : (perfil.salario_base || 0);
   const nome = escapeHtml(perfil.nome || 'Funcionário');
   const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -2686,6 +3019,7 @@ function abrirHoleriteDemonstrativo() {
     ['Salário Base', fmtBRL(salBase), 'provento'],
     he50h > 0 ? [`HE 75% (${he50h}h × ${fmtBRL(r.valorHora)} × 1,75)`, fmtBRL(r.valorHE50), 'provento'] : null,
     he100h > 0 ? [`HE 100% (${he100h}h × ${fmtBRL(r.valorHora)} × 2,00)`, fmtBRL(r.valorHE100), 'provento'] : null,
+    r.valorAdicNoturno > 0 ? [`Adicional noturno (${formatHoras(r.noturnasH)} × ${Math.round(r.pNoturno*100)}%)`, fmtBRL(r.valorAdicNoturno), 'provento'] : null,
     r.dsrReflexo > 0 ? ['Reflexo Extras DSR', fmtBRL(r.dsrReflexo), 'provento'] : null,
     r.inss > 0 ? ['INSS (tabela progressiva 2024)', fmtBRL(r.inss), 'desconto'] : null,
     r.irrf > 0 ? ['IRRF (tabela progressiva 2024)', fmtBRL(r.irrf), 'desconto'] : null,
