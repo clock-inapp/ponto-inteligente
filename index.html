@@ -527,6 +527,11 @@
   .graf-dia { font-size: 9px; color: var(--text-dim); margin-top: 4px; }
   .graf-dia.hoje { color: var(--primary-light); font-weight: 800; }
   .graf-meta-line { position: absolute; left: 0; right: 0; border-top: 1px dashed var(--warning); opacity: .55; pointer-events: none; }
+  /* ───── BANNER DEMO ───── */
+  #demo-banner { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 3000;
+    background: var(--primary); color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
+    box-shadow: 0 8px 24px rgba(0,0,0,.35); display: flex; align-items: center; gap: 8px; max-width: 94vw; }
+  #demo-banner a { color: #fff; text-decoration: underline; font-weight: 800; margin-left: 4px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -910,7 +915,7 @@
               <div class="sim-row"><div class="label">HE 75% (<span id="res-he50-h">0h</span>)</div><div class="value positive" id="res-he50">R$ 0,00</div></div>
               <div class="sim-row"><div class="label">HE 100% (<span id="res-he100-h">0h</span>)</div><div class="value positive" id="res-he100">R$ 0,00</div></div>
               <div class="sim-row"><div class="label">Adicional noturno (<span id="res-noturnas-h">0h</span>)</div><div class="value positive" id="res-noturnas">R$ 0,00</div></div>
-              <div class="sim-row"><div class="label">Reflexo DSR sobre HE</div><div class="value positive" id="res-dsr">R$ 0,00</div></div>
+              <div class="sim-row"><div class="label">Reflexo DSR (HE + noturno)</div><div class="value positive" id="res-dsr">R$ 0,00</div></div>
               <div class="sim-row" style="font-weight:700"><div class="label">Salário Bruto</div><div class="value" id="res-bruto">R$ 0,00</div></div>
             </div>
             <div class="sim-section">
@@ -1595,10 +1600,150 @@
 // CONFIGURAÇÃO SUPABASE
 // ═══════════════════════════════════════════════════════════
 const { createClient } = supabase;
-const db = createClient(
+let db = createClient(
   'https://axytwuwonpiqfxylyxsp.supabase.co',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF4eXR3dXdvbnBpcWZ4eWx5eHNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA5MzIyOTYsImV4cCI6MjA5NjUwODI5Nn0.UKtFTxn-D5ZufaDBUtj4bEtup-9BMmDKueShp9qCPUY'
 );
+
+// ═══════════════════════════════════════════════════════════
+// MODO DEMONSTRAÇÃO (?demo=1) — sem login, dados de exemplo em memória
+// Substitui o cliente Supabase por um mock; nada é enviado à rede.
+// ═══════════════════════════════════════════════════════════
+const DEMO = new URLSearchParams(location.search).get('demo') === '1' || location.hash === '#demo';
+const DEMO_USER = { id: 'demo-user-0001', email: 'demo@clockin.app' };
+
+function demoSeed() {
+  const now = new Date();
+  const uid = DEMO_USER.id;
+  const pad = n => String(n).padStart(2, '0');
+  let rid = 1, jid = 1, aid = 1;
+  const registros = [], justificados = [], atestadosArr = [];
+
+  // Gera um mês de exemplo (yy, mês 0-based mi, até o dia maxDay)
+  function genMonth(yy, mi, maxDay) {
+    const dstr = day => `${yy}-${pad(mi + 1)}-${pad(day)}`;
+    const iso = (day, h, min) => new Date(yy, mi, day, h, min, 0).toISOString();
+    const weekdays = [];
+    for (let day = 1; day <= maxDay; day++) { const dow = new Date(yy, mi, day).getDay(); if (dow !== 0 && dow !== 6) weekdays.push(day); }
+    const nightSet = new Set([weekdays[1], weekdays[3]].filter(Boolean));
+    const feriadoDay = weekdays[2];
+    const atestadoDay = weekdays[6];
+    weekdays.forEach(day => {
+      if (day === feriadoDay || day === atestadoDay) return; // dias abonados: sem ponto
+      if (nightSet.has(day)) {
+        registros.push({ id: 'r' + rid++, user_id: uid, data: dstr(day), tipo: 'entrada', timestamp: iso(day, 20, 0), observacao: 'Plantão' });
+        registros.push({ id: 'r' + rid++, user_id: uid, data: dstr(day), tipo: 'saida', timestamp: iso(day + 1, 4, 0), observacao: null });
+        return;
+      }
+      const extra = (day % 5 === 0) ? 120 : (day % 3 === 0 ? 45 : 0); // minutos após as 17h
+      registros.push({ id: 'r' + rid++, user_id: uid, data: dstr(day), tipo: 'entrada', timestamp: iso(day, 8, 0), observacao: null });
+      registros.push({ id: 'r' + rid++, user_id: uid, data: dstr(day), tipo: 'saida_almoco', timestamp: iso(day, 12, 0), observacao: null });
+      registros.push({ id: 'r' + rid++, user_id: uid, data: dstr(day), tipo: 'retorno_almoco', timestamp: iso(day, 13, 0), observacao: null });
+      registros.push({ id: 'r' + rid++, user_id: uid, data: dstr(day), tipo: 'saida', timestamp: iso(day, 17, extra), observacao: null });
+    });
+    if (feriadoDay) justificados.push({ id: 'j' + jid++, user_id: uid, data: dstr(feriadoDay), tipo: 'feriado', observacao: 'Feriado municipal' });
+    if (atestadoDay) atestadosArr.push({ id: 'a' + aid++, user_id: uid, tipo: 'horas_parciais', data_inicio: dstr(atestadoDay), data_fim: dstr(atestadoDay), horas_abonadas: 4, observacao: 'Consulta médica' });
+  }
+
+  const y = now.getFullYear(), m = now.getMonth();
+  const prevDate = new Date(y, m - 1, 1);
+  const prevY = prevDate.getFullYear(), prevMi = prevDate.getMonth();
+  genMonth(prevY, prevMi, new Date(prevY, prevMi + 1, 0).getDate()); // mês anterior completo
+  genMonth(y, m, now.getDate()); // mês atual até hoje
+
+  const prevM = prevMi + 1;
+
+  return {
+    perfis: [{ id: uid, nome: 'Alex Demonstração', salario_base: 3200, carga_horaria_diaria: 8, carga_horaria_mensal: 220, percentual_he_50: 75, percentual_he_100: 100, horario_entrada: '08:00', horario_saida: '17:00', intervalo_minutos: 60, meta_he_mensal: 40, dia_pagamento: 5, created_at: new Date(y - 1, 0, 10).toISOString() }],
+    config_descontos: [{ user_id: uid, inss_ativo: true, irrf_ativo: true, vt_ativo: true, vt_valor: 6, vr_ativo: true, vr_valor: 300, plano_saude_ativo: true, plano_saude_valor: 150 }],
+    descontos_extras: [{ id: 'd1', user_id: uid, nome: 'Vale Cultura', tipo: 'fixo', valor: 50, ativo: true, created_at: new Date(y - 1, 0, 10).toISOString() }],
+    registros_ponto: registros,
+    dias_justificados: justificados,
+    atestados_medicos: atestadosArr,
+    holerites: [{ id: 'h1', user_id: uid, mes: prevM, ano: prevY, salario_bruto: 3380.5, salario_liquido: 2790.2, observacoes: 'Holerite de exemplo', arquivo_url: null, arquivo_nome: null }],
+    admins: []
+  };
+}
+
+function makeDemoDb() {
+  const store = demoSeed();
+  let seq = 1000;
+  const genId = () => 'demo' + (++seq);
+  const clone = v => JSON.parse(JSON.stringify(v));
+
+  class Q {
+    constructor(table) { this.table = table; this.op = 'select'; this.filters = []; this.orders = []; this._single = false; this._payload = null; this._conflict = null; }
+    select() { if (this.op !== 'insert' && this.op !== 'upsert') this.op = 'select'; return this; }
+    insert(p) { this.op = 'insert'; this._payload = p; return this; }
+    upsert(p, opts) { this.op = 'upsert'; this._payload = p; this._conflict = opts && opts.onConflict ? opts.onConflict.split(',').map(s => s.trim()) : ['id']; return this; }
+    update(p) { this.op = 'update'; this._payload = p; return this; }
+    delete() { this.op = 'delete'; return this; }
+    eq(col, val) { this.filters.push(r => r[col] === val); return this; }
+    gte(col, val) { this.filters.push(r => r[col] >= val); return this; }
+    lte(col, val) { this.filters.push(r => r[col] <= val); return this; }
+    in(col, vals) { this.filters.push(r => vals.includes(r[col])); return this; }
+    order(col, opts) { this.orders.push({ col, asc: !(opts && opts.ascending === false) }); return this; }
+    single() { this._single = true; return this; }
+    _match(rows) { return rows.filter(r => this.filters.every(f => f(r))); }
+    _sort(rows) {
+      this.orders.forEach(o => rows.sort((a, b) => (a[o.col] > b[o.col] ? 1 : a[o.col] < b[o.col] ? -1 : 0) * (o.asc ? 1 : -1)));
+      return rows;
+    }
+    _run() {
+      if (!store[this.table]) store[this.table] = [];
+      const tbl = store[this.table];
+      let data = null;
+      if (this.op === 'select') {
+        data = this._sort(this._match(tbl.slice()));
+        data = this._single ? (data[0] || null) : clone(data);
+      } else if (this.op === 'insert') {
+        const arr = Array.isArray(this._payload) ? this._payload : [this._payload];
+        const inserted = arr.map(o => { const row = { id: o.id || genId(), ...o }; tbl.push(row); return row; });
+        data = this._single ? clone(inserted[0]) : clone(inserted);
+      } else if (this.op === 'upsert') {
+        const arr = Array.isArray(this._payload) ? this._payload : [this._payload];
+        const affected = arr.map(o => {
+          const idx = tbl.findIndex(r => this._conflict.every(k => r[k] === o[k]));
+          if (idx >= 0) { tbl[idx] = { ...tbl[idx], ...o }; return tbl[idx]; }
+          const row = { id: o.id || genId(), ...o }; tbl.push(row); return row;
+        });
+        data = this._single ? clone(affected[0]) : clone(affected);
+      } else if (this.op === 'update') {
+        this._match(tbl).forEach(r => Object.assign(r, this._payload));
+        data = null;
+      } else if (this.op === 'delete') {
+        const rm = new Set(this._match(tbl));
+        store[this.table] = tbl.filter(r => !rm.has(r));
+        data = null;
+      }
+      return { data, error: null };
+    }
+    then(resolve, reject) { try { resolve(this._run()); } catch (e) { resolve({ data: null, error: { message: e.message } }); } }
+  }
+
+  return {
+    from(table) { return new Q(table); },
+    auth: {
+      async getSession() { return { data: { session: { user: DEMO_USER } } }; },
+      onAuthStateChange() { return { data: { subscription: { unsubscribe() {} } } }; },
+      async signOut() { return { error: null }; },
+      async signInWithPassword() { return { error: null }; },
+      async signUp() { return { error: null }; },
+      async signInWithOAuth() { return { error: null }; },
+      async resetPasswordForEmail() { return { error: null }; },
+    },
+    storage: {
+      from() {
+        return {
+          async upload(path) { return { data: { path }, error: null }; },
+          getPublicUrl() { return { data: { publicUrl: '#' } }; },
+        };
+      }
+    }
+  };
+}
+
+if (DEMO) { db = makeDemoDb(); }
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -1661,6 +1806,15 @@ function showApp() {
   updateUserUI();
   navigate('dashboard');
   if (remindersOn()) scheduleReminders();
+  if (DEMO) showDemoBanner();
+}
+
+function showDemoBanner() {
+  if (document.getElementById('demo-banner')) return;
+  const b = document.createElement('div');
+  b.id = 'demo-banner';
+  b.innerHTML = '<i class="fas fa-flask"></i> Modo demonstração — dados de exemplo, nada é salvo. <a href="' + location.pathname + '">Sair do demo</a>';
+  document.body.appendChild(b);
 }
 
 async function loadUserData() {
@@ -2047,7 +2201,7 @@ async function renderDashboard() {
         ['HE 75% ('+formatHoras(totalHE50)+')', sim.valorHE50, 'positive'],
         ['HE 100% ('+formatHoras(totalHE100)+')', sim.valorHE100, 'positive'],
         ['Adicional noturno ('+formatHoras(totalNoturnas)+')', sim.valorAdicNoturno, 'positive'],
-        ['Reflexo DSR sobre HE', sim.dsrReflexo, 'positive'],
+        ['Reflexo DSR (HE + noturno)', sim.dsrReflexo, 'positive'],
       ].map(([l, v, cls]) => v !== 0 && v !== -0 ? `
         <div class="sim-row"><div class="label">${l}</div><div class="value ${cls}">${v < 0 ? '- ' + fmtBRL(-v) : fmtBRL(v)}</div></div>
       ` : '').join('')}
@@ -2276,10 +2430,10 @@ function calcSalario(salarioOverride = null, he50h = 0, he100h = 0, ano = null, 
   const adicNoturnoCfg = getAdicNoturnoCfg();
   const pNoturno = adicNoturnoCfg.ativo ? ((adicNoturnoCfg.pct || 0) / 100) : 0;
   const valorAdicNoturno = (noturnasH || 0) * valorHora * pNoturno;
-  // Reflexo de Horas Extras no DSR (Lei 605/49): HE em R$ no mês ÷ dias úteis × (domingos + feriados)
+  // Reflexo de verbas variáveis no DSR (Lei 605/49): (HE + adicional noturno) em R$ ÷ dias úteis × (domingos + feriados)
   const diasUteisMes = getDiasUteisNoMes(anoCalc, mesCalc);
   const domingosFeriadosMes = getDomingosEFeriadosNoMes(anoCalc, mesCalc);
-  const dsrReflexo = diasUteisMes > 0 ? ((valorHE50 + valorHE100) / diasUteisMes) * domingosFeriadosMes : 0;
+  const dsrReflexo = diasUteisMes > 0 ? ((valorHE50 + valorHE100 + valorAdicNoturno) / diasUteisMes) * domingosFeriadosMes : 0;
   const bruto = salBase + valorHE50 + valorHE100 + valorAdicNoturno + dsrReflexo;
   const inss = calcINSS(bruto);
   const irrf = calcIRRF(bruto - inss);
@@ -3020,7 +3174,7 @@ function abrirHoleriteDemonstrativo() {
     he50h > 0 ? [`HE 75% (${he50h}h × ${fmtBRL(r.valorHora)} × 1,75)`, fmtBRL(r.valorHE50), 'provento'] : null,
     he100h > 0 ? [`HE 100% (${he100h}h × ${fmtBRL(r.valorHora)} × 2,00)`, fmtBRL(r.valorHE100), 'provento'] : null,
     r.valorAdicNoturno > 0 ? [`Adicional noturno (${formatHoras(r.noturnasH)} × ${Math.round(r.pNoturno*100)}%)`, fmtBRL(r.valorAdicNoturno), 'provento'] : null,
-    r.dsrReflexo > 0 ? ['Reflexo Extras DSR', fmtBRL(r.dsrReflexo), 'provento'] : null,
+    r.dsrReflexo > 0 ? ['Reflexo DSR (HE + adic. noturno)', fmtBRL(r.dsrReflexo), 'provento'] : null,
     r.inss > 0 ? ['INSS (tabela progressiva 2024)', fmtBRL(r.inss), 'desconto'] : null,
     r.irrf > 0 ? ['IRRF (tabela progressiva 2024)', fmtBRL(r.irrf), 'desconto'] : null,
     r.vt > 0 ? [`Vale Transporte (${configDescontos.vt_valor || 0}% do bruto)`, fmtBRL(r.vt), 'desconto'] : null,
