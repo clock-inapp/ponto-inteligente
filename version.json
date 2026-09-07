@@ -1,4 +1,4 @@
 {
-  "version": "1.12",
-  "notes": "Adicional noturno agora reflete no DSR (Lei 605/49) e novo modo demonstração sem login (?demo=1) com dados de exemplo em memória"
+  "version": "1.13",
+  "notes": "Melhora o espaçamento do resumo financeiro no dashboard (coluna única no celular, mais respiro entre as linhas)"
 }

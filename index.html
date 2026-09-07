@@ -2189,7 +2189,7 @@ async function renderDashboard() {
 
   // Resumo financeiro
   document.getElementById('dash-financeiro').innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:4px 32px">
       ${[
         ['Salário Bruto', sim.bruto, ''],
         ['INSS', -sim.inss, 'negative'],
