@@ -1,4 +1,4 @@
 {
-  "version": "1.13",
-  "notes": "Melhora o espaçamento do resumo financeiro no dashboard (coluna única no celular, mais respiro entre as linhas)"
+  "version": "1.14",
+  "notes": "13º salário mostra datas e valores das parcelas (1ª até 30/11, 2ª até 20/12) e agora inclui a média de horas extras/adicional noturno registrados no ano"
 }
