@@ -1,4 +1,4 @@
 {
-  "version": "1.20",
-  "notes": "Revisão legal completa: tabelas INSS/IRRF 2026 (com redutor da Lei 15.270), feriados nacionais, HE 100% em domingo/feriado, hora noturna reduzida, VT sobre o salário base, DSR no 13º e férias; Simulação projeta o 13º em 12 meses; resumo do 13º na aba Ajuda"
+  "version": "1.21",
+  "notes": "Explicações do 13º Beta (conta passo a passo, descontos permitidos e fim da 6x1) foram para a aba Ajuda; correções: plantão que passa da meia-noite, ponto com o app aberto desde ontem, lançamento/edição de dias noturnos, remover dia especial, holerites com acento no nome, status de intervalo e mais"
 }

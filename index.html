@@ -564,6 +564,13 @@
   .aj13-regra-tit { font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
   .aj13-regra-txt { font-size: 12.5px; color: var(--text-muted); line-height: 1.55; }
   .aj13-regra-txt strong { color: var(--text); }
+  .aj13-passos { margin-top: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+  .aj13-passos > summary { list-style: none; cursor: pointer; padding: 11px 14px; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px; color: var(--primary-light); }
+  .aj13-passos > summary::-webkit-details-marker { display: none; }
+  .aj13-passos > summary .ajuda-arrow { margin-left: auto; }
+  .aj13-passos[open] .ajuda-arrow { transform: rotate(180deg); }
+  .aj13-passos #aj13-memoria { padding: 4px 14px 14px; }
   .aj13-fontes { font-size: 11px; color: var(--text-dim); margin-top: 12px; line-height: 1.5; }
   /* ───── 13º BETA — PÁGINA DETALHADA ───── */
   .dt13-explica p { margin: 0 0 10px; }
@@ -1232,7 +1239,7 @@
         <!-- Explicação do 13º fica na aba Ajuda -->
         <div class="card mb-4" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <i class="fas fa-circle-question" style="color:var(--info);font-size:18px"></i>
-          <div style="flex:1;min-width:200px;font-size:13px;color:var(--text-muted)">A explicação de como o 13º funciona (meses, média das horas extras, parcelas, prazos e descontos) agora fica na aba <strong style="color:var(--text)">Ajuda</strong>, junto com o resumo de quanto você tem para receber.</div>
+          <div style="flex:1;min-width:200px;font-size:13px;color:var(--text-muted)">As explicações (como o 13º funciona, a conta passo a passo, os descontos permitidos e o que muda com o fim da 6x1) ficam na aba <strong style="color:var(--text)">Ajuda</strong>. Aqui ficam só os ajustes da simulação.</div>
           <button class="btn btn-secondary" style="width:auto;padding:8px 14px;font-size:13px" onclick="navigate('ajuda')"><i class="fas fa-arrow-right"></i> Ver na Ajuda</button>
         </div>
 
@@ -1256,7 +1263,7 @@
               <i class="fas fa-calculator"></i> Meses computados para o 13º (avos)
             </div>
             <div style="font-size:22px;font-weight:800;color:var(--primary-light)" id="dt13-meses-computados">0 de 12</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Calculado a partir da tabela "Dias trabalhados mês a mês" abaixo — ajuste mês a mês lá se algum mês não tiver registro de ponto mas você tiver trabalhado normalmente.</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Ajuste mês a mês na tabela "Dias trabalhados" abaixo.</div>
           </div>
         </div>
 
@@ -1265,17 +1272,7 @@
           <div class="card-header">
             <span class="card-title"><i class="fas fa-business-time" style="color:#a78bfa"></i> Escala de trabalho — fim da 6x1 (EC 141/2026)</span>
           </div>
-          <div class="dt13-explica" style="padding:0 2px 12px;font-size:12.5px;color:var(--text-muted)">
-            <p>A <strong style="color:var(--text)">Emenda Constitucional 141/2026</strong> (origem: PEC 221/2019) acaba com a escala 6x1 e torna a <strong style="color:var(--text)">5x2</strong> a regra geral. Principais pontos:</p>
-            <ul>
-              <li><strong style="color:var(--text)">2 dias de descanso semanal remunerado</strong>, um deles preferencialmente no domingo.</li>
-              <li><strong style="color:var(--text)">Jornada semanal máxima</strong> cai de 44h → <strong>42h</strong> (60 dias após a promulgação) → <strong>40h</strong> (12 meses depois da 1ª etapa). O limite de 8h por dia continua.</li>
-              <li><strong style="color:var(--text)">Sem redução de salário</strong> nem de piso da categoria. Como o salário é o mesmo e as horas diminuem, o <strong>valor da sua hora sobe</strong> (divisor mensal 220h → 210h → 200h) — e cada hora extra passa a valer mais, inclusive na média do 13º.</li>
-              <li><strong style="color:var(--text)">Quem já trabalha 40h ou menos</strong> não muda de carga horária, mas passa a ter as 2 folgas garantidas.</li>
-              <li><strong style="color:var(--text)">Acordo coletivo</strong> pode calcular as 2 folgas pela média do mês (setores contínuos: comércio, saúde, transporte…), mas nunca mais de 7 dias seguidos sem folga.</li>
-              <li><strong style="color:var(--text)">Exceções:</strong> servidores públicos (regras próprias) e empregados com diploma de nível superior e salário ≥ R$ 21.188,00 (2,5× o teto do INSS) não seguem o limite de jornada — mas mantêm as 2 folgas. MEIs/microempresas podem ter regras de transição por lei complementar futura.</li>
-            </ul>
-          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px">O que muda com a EC 141/2026 está explicado na aba <a href="#" onclick="navigate('ajuda');return false" style="color:var(--primary-light)">Ajuda</a>.</div>
           <div class="grid-2" style="gap:16px">
             <div class="input-group" style="margin:0">
               <label>Escala usada no cálculo</label>
@@ -1294,14 +1291,6 @@
           <div id="dt13-fases-info" style="font-size:11.5px;color:var(--text-muted);margin-top:10px"></div>
           <div class="sim-section-title mt-4" style="margin-bottom:8px"><i class="fas fa-scale-balanced"></i> Mesmas horas extras do ano, em cada regime</div>
           <div class="dt13-comp-grid" id="dt13-comp-regimes"></div>
-        </div>
-
-        <!-- Memória de cálculo -->
-        <div class="card mb-4">
-          <div class="card-header">
-            <span class="card-title"><i class="fas fa-list-ol" style="color:var(--success)"></i> Memória de cálculo</span>
-          </div>
-          <div id="dt13-memoria"></div>
         </div>
 
         <!-- Parcelas -->
@@ -1406,17 +1395,7 @@
           <div class="card-header">
             <span class="card-title"><i class="fas fa-minus-circle" style="color:var(--danger)"></i> Descontos sobre o 13º (2ª parcela)</span>
           </div>
-          <div style="font-size:12px;color:var(--text-muted);padding:0 2px 12px;line-height:1.6">
-            O 13º é uma gratificação natalina com regras de desconto bem mais restritas que o salário mensal, pela CLT e pelo eSocial. A lista abaixo mostra o que pode e o que <strong style="color:var(--danger)">não pode</strong> ser descontado.
-          </div>
-          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:9px;padding:12px 14px;margin-bottom:10px">
-            <div style="font-size:11px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px"><i class="fas fa-check-circle"></i> Pode ser descontado</div>
-            <div style="font-size:12px;color:var(--text-muted);line-height:1.6">INSS, IRRF (acima da faixa de isenção), <strong style="color:var(--text)">pensão alimentícia</strong> (só com determinação judicial expressa) e o valor já adiantado na 1ª parcela.</div>
-          </div>
-          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:12px 14px;margin-bottom:14px">
-            <div style="font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px"><i class="fas fa-times-circle"></i> NÃO pode ser descontado</div>
-            <div style="font-size:12px;color:var(--text-muted);line-height:1.6"><strong style="color:var(--text)">Vale Transporte e Vale Refeição/Alimentação</strong> — esses benefícios cobrem dias de deslocamento/refeição do mês corrente; o 13º não corresponde a dias trabalhados, então nenhum vale novo é concedido e nada é descontado. <strong style="color:var(--text)">Empréstimo consignado</strong> — por regra do Ministério do Trabalho, parcelas de consignado só podem ser cobradas nas 12 folhas mensais regulares; o próprio eSocial bloqueia esse lançamento na folha do 13º. Se aparecer algum desses descontos na sua folha, é motivo pra procurar o RH e pedir a correção/devolução.</div>
-          </div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Só aparecem os descontos que a lei permite no 13º. O que pode e o que não pode ser descontado está na aba <a href="#" onclick="navigate('ajuda');return false" style="color:var(--primary-light)">Ajuda</a>.</div>
           <div class="toggle-row">
             <div class="info"><span>Pensão Alimentícia</span><small>Só com determinação judicial expressa</small></div>
             <div style="display:flex;align-items:center;gap:4px;margin:0 10px">
@@ -1701,6 +1680,10 @@
             <div class="sim-row"><div class="label">(−) Imposto de Renda</div><div class="value negative" id="aj13-irrf">R$ 0,00</div></div>
           </div>
           <div class="aj13-aviso" id="aj13-aviso"></div>
+          <details class="aj13-passos">
+            <summary><i class="fas fa-list-ol"></i> Ver a conta passo a passo <i class="fas fa-chevron-down ajuda-arrow"></i></summary>
+            <div id="aj13-memoria"></div>
+          </details>
           <button class="btn btn-secondary mt-4" onclick="navigate('simulacao')"><i class="fas fa-sliders-h"></i> Simular outros cenários</button>
         </div>
 
@@ -1735,6 +1718,43 @@
         </div>
 
         <div class="ajuda-accordion">
+
+          <!-- Descontos do 13º -->
+          <details class="ajuda-item">
+            <summary class="ajuda-title">
+              <span><i class="fas fa-scissors" style="color:var(--danger)"></i> 13º: o que pode e o que não pode ser descontado</span>
+              <i class="fas fa-chevron-down ajuda-arrow"></i>
+            </summary>
+            <div class="ajuda-body">
+              <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:9px;padding:12px 14px;margin-bottom:10px">
+                <div style="font-size:11px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px"><i class="fas fa-check-circle"></i> Pode ser descontado</div>
+                <div class="ajuda-step-text"><strong>INSS</strong> e <strong>Imposto de Renda</strong> — calculados sobre o 13º inteiro, separados do salário de dezembro, e descontados só na 2ª parcela. <strong>Pensão alimentícia</strong>, quando a decisão judicial manda incluir o 13º. E, claro, o valor já adiantado na 1ª parcela.</div>
+              </div>
+              <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:12px 14px">
+                <div style="font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px"><i class="fas fa-times-circle"></i> Não pode ser descontado</div>
+                <div class="ajuda-step-text"><strong>Vale-transporte e vale-refeição/alimentação</strong> — cobrem os dias de trabalho do mês; o 13º não corresponde a dias trabalhados. <strong>Empréstimo consignado</strong> — as parcelas só podem ser cobradas nas folhas mensais; o eSocial bloqueia esse lançamento no 13º. <strong>Plano de saúde</strong> só em exceção rara, com previsão em convenção coletiva ou autorização sua por escrito.</div>
+              </div>
+              <div class="ajuda-tip"><i class="fas fa-circle-info"></i> <span>Se aparecer algum desses descontos no seu 13º, procure o RH e peça a correção ou a devolução.</span></div>
+            </div>
+          </details>
+
+          <!-- EC 141/2026 -->
+          <details class="ajuda-item">
+            <summary class="ajuda-title">
+              <span><i class="fas fa-business-time" style="color:#a78bfa"></i> Fim da escala 6x1 (EC 141/2026)</span>
+              <i class="fas fa-chevron-down ajuda-arrow"></i>
+            </summary>
+            <div class="ajuda-body">
+              <div class="ajuda-step-text" style="margin-bottom:10px">A <strong>Emenda Constitucional 141/2026</strong> (origem: PEC 221/2019) acaba com a escala 6x1 e torna a <strong>5x2</strong> a regra geral.</div>
+              <div class="ajuda-step"><div class="ajuda-step-num">1</div><div class="ajuda-step-text"><strong>2 dias de descanso semanal remunerado</strong>, um deles preferencialmente no domingo.</div></div>
+              <div class="ajuda-step"><div class="ajuda-step-num">2</div><div class="ajuda-step-text"><strong>Jornada semanal máxima</strong> cai de 44h para <strong>42h</strong> 60 dias após a promulgação, e para <strong>40h</strong> 12 meses depois. O limite de 8h por dia continua.</div></div>
+              <div class="ajuda-step"><div class="ajuda-step-num">3</div><div class="ajuda-step-text"><strong>Sem redução de salário</strong> nem do piso da categoria. Com o mesmo salário e menos horas, o <strong>valor da hora sobe</strong> (divisor 220h → 210h → 200h) e cada hora extra vale mais, inclusive na média do 13º.</div></div>
+              <div class="ajuda-step"><div class="ajuda-step-num">4</div><div class="ajuda-step-text"><strong>Quem já trabalha 40h ou menos</strong> não muda de carga horária, mas passa a ter as 2 folgas garantidas.</div></div>
+              <div class="ajuda-step"><div class="ajuda-step-num">5</div><div class="ajuda-step-text"><strong>Acordo coletivo</strong> pode calcular as 2 folgas pela média do mês em setores contínuos (comércio, saúde, transporte), mas nunca mais de 7 dias seguidos sem folga.</div></div>
+              <div class="ajuda-step"><div class="ajuda-step-num">6</div><div class="ajuda-step-text"><strong>Exceções:</strong> servidores públicos (regras próprias) e empregados com nível superior e salário a partir de R$ 21.188,00 (2,5× o teto do INSS) não seguem o limite de jornada, mas mantêm as 2 folgas. MEIs e microempresas podem ter transição por lei complementar.</div></div>
+              <div class="ajuda-tip"><i class="fas fa-flask"></i> <span>Os cálculos do app seguem a CLT de hoje. O efeito da emenda no seu 13º é simulado na área Beta.</span></div>
+            </div>
+          </details>
 
           <!-- 1 — Primeiros passos -->
           <details class="ajuda-item">
@@ -2004,6 +2024,7 @@
     </div>
     <p style="color:var(--text-muted);font-size:13px;margin-bottom:16px" id="edit-day-label">Dia</p>
     <div id="edit-day-records"></div>
+    <div id="edit-day-especial"></div>
     <div class="input-group mt-4">
       <label>Motivo da edição</label>
       <input type="text" id="edit-motivo" class="form-control" placeholder="Ex: horário digitado errado...">
@@ -2176,6 +2197,8 @@ function makeDemoDb() {
         return {
           async upload(path) { return { data: { path }, error: null }; },
           getPublicUrl() { return { data: { publicUrl: '#' } }; },
+          async createSignedUrl() { return { data: null, error: null }; },
+          async remove() { return { data: [], error: null }; },
         };
       }
     }
@@ -2229,14 +2252,28 @@ async function init() {
     showAuth();
   }
   db.auth.onAuthStateChange(async (event, session) => {
-    if (event === 'SIGNED_IN' && session) {
+    // O Supabase reemite SIGNED_IN ao voltar para a aba/renovar a sessão: só recarrega se mudou o usuário,
+    // senão o app voltava sozinho para o Dashboard no meio do uso
+    if (event === 'SIGNED_IN' && session && (!currentUser || currentUser.id !== session.user.id)) {
       currentUser = session.user;
       await loadUserData();
       showApp();
+    } else if (event === 'PASSWORD_RECOVERY') {
+      // Link de "Esqueci minha senha": pede a nova senha (antes não havia onde definir)
+      setTimeout(definirNovaSenha, 300);
     } else if (event === 'SIGNED_OUT') {
       showAuth();
     }
   });
+}
+
+async function definirNovaSenha() {
+  const nova = prompt('Digite sua nova senha (mínimo 6 caracteres):');
+  if (nova == null) return;
+  if (nova.length < 6) { alert('A senha precisa ter pelo menos 6 caracteres.'); return definirNovaSenha(); }
+  const { error } = await db.auth.updateUser({ password: nova });
+  if (error) { alert('Erro ao trocar a senha: ' + error.message); return; }
+  toast('Senha alterada com sucesso!', 'success');
 }
 
 function hideLoader() { document.getElementById('page-loader').style.display = 'none'; }
@@ -2388,7 +2425,7 @@ async function navigate(page) {
   closeSidebar();
   atualizarRotulosHE();
   if (page === 'dashboard') await renderDashboard();
-  if (page === 'ponto') renderPonto();
+  if (page === 'ponto') { await loadRegistrosHoje(); renderPonto(); }
   if (page === 'historico') await renderHistorico();
   if (page === 'simulacao') await renderSimulacao();
   if (page === 'holerites') await renderHolerites();
@@ -2446,11 +2483,36 @@ const TIPO_ICONS = {
 };
 const TIPO_ORDER = ['entrada', 'saida_almoco', 'retorno_almoco', 'saida'];
 
+// Jornada em andamento: a de hoje ou, num plantão que passou da meia-noite, a de ontem ainda aberta.
+// Os registros do plantão ficam todos na data em que ele começou.
+let jornadaData = null;
 async function loadRegistrosHoje() {
-  const today = localDateStr();
+  const agora = new Date();
+  const today = localDateStr(agora);
   const { data } = await db.from('registros_ponto').select('*')
     .eq('user_id', activeId()).eq('data', today).order('timestamp');
   registrosHoje = data || [];
+  jornadaData = today;
+  if (registrosHoje.length) return;
+  const ontem = localDateStr(new Date(agora.getFullYear(), agora.getMonth(), agora.getDate() - 1));
+  const { data: dOntem } = await db.from('registros_ponto').select('*')
+    .eq('user_id', activeId()).eq('data', ontem).order('timestamp');
+  const regs = dOntem || [];
+  const entrada = regs.find(r => r.tipo === 'entrada');
+  if (entrada && !regs.some(r => r.tipo === 'saida') && agora - new Date(entrada.timestamp) < 16 * 3600000) {
+    registrosHoje = regs;
+    jornadaData = ontem;
+  }
+}
+
+// Próximos registros permitidos, na ordem entrada → saída almoço → retorno → saída
+function tiposPermitidos(tipos) {
+  return {
+    entrada: !tipos.includes('entrada'),
+    saida_almoco: tipos.includes('entrada') && !tipos.includes('saida_almoco') && !tipos.includes('saida'),
+    retorno_almoco: tipos.includes('saida_almoco') && !tipos.includes('retorno_almoco') && !tipos.includes('saida'),
+    saida: tipos.includes('entrada') && !tipos.includes('saida'),
+  };
 }
 
 function renderPonto() {
@@ -2458,12 +2520,8 @@ function renderPonto() {
   document.getElementById('ponto-today-date').textContent = today;
 
   const tipos = registrosHoje.map(r => r.tipo);
-  const btns = {
-    'btn-entrada': !tipos.includes('entrada'),
-    'btn-saida-almoco': tipos.includes('entrada') && !tipos.includes('saida_almoco') && !tipos.includes('saida'),
-    'btn-retorno-almoco': tipos.includes('saida_almoco') && !tipos.includes('retorno_almoco') && !tipos.includes('saida'),
-    'btn-saida': (tipos.includes('retorno_almoco') || tipos.includes('entrada')) && !tipos.includes('saida')
-  };
+  const ok = tiposPermitidos(tipos);
+  const btns = { 'btn-entrada': ok.entrada, 'btn-saida-almoco': ok.saida_almoco, 'btn-retorno-almoco': ok.retorno_almoco, 'btn-saida': ok.saida };
   Object.entries(btns).forEach(([id, enabled]) => {
     document.getElementById(id).disabled = !enabled || pontoBloqueado;
   });
@@ -2479,6 +2537,10 @@ function renderPonto() {
     status.innerHTML = '<div class="status-dot green"></div><span>Trabalhando</span>';
   } else {
     status.innerHTML = '<div class="status-dot gray"></div><span>Nenhum registro hoje</span>';
+  }
+  if (jornadaData && jornadaData !== localDateStr() && registrosHoje.length) {
+    const [, m, d] = jornadaData.split('-');
+    status.innerHTML += `<span style="font-size:12px;color:var(--text-muted)"> · plantão iniciado em ${d}/${m}</span>`;
   }
 
   const container = document.getElementById('today-records');
@@ -2501,11 +2563,17 @@ function renderPonto() {
 async function registrarPonto(tipo) {
   if (pontoBloqueado) return;
   pontoBloqueado = true;
+  // Recarrega antes de gravar: o app pode ter ficado aberto desde ontem ou o ponto já ter sido batido em outro aparelho
+  await loadRegistrosHoje();
+  if (!tiposPermitidos(registrosHoje.map(r => r.tipo))[tipo]) {
+    toast(TIPO_LABELS[tipo] + ' já foi registrada ou está fora de ordem', 'warning');
+    renderPonto(); pontoBloqueado = false; return;
+  }
   const now = new Date();
   const obs = document.getElementById('ponto-obs').value.trim();
   const { error } = await db.from('registros_ponto').insert({
     user_id: activeId(), tipo, timestamp: now.toISOString(),
-    data: localDateStr(now), observacao: obs || null
+    data: jornadaData || localDateStr(now), observacao: obs || null
   });
   if (error) { toast('Erro ao registrar ponto: ' + error.message, 'error'); pontoBloqueado = false; return; }
   toast(TIPO_LABELS[tipo] + ' registrada com sucesso!', 'success');
@@ -2528,8 +2596,8 @@ function calcHorasDia(registros, dataStr) {
   if (saidaAlmoco && !retornoAlmoco) {
     return Math.max(0, (new Date(saidaAlmoco.timestamp) - new Date(entrada.timestamp)) / 3600000);
   }
-  // Sem "saída" registrada: só usa o horário atual se for o dia de hoje — dias passados não inventam horas
-  const ehHoje = !dataStr || dataStr === localDateStr();
+  // Sem "saída" registrada: só usa o horário atual na jornada em andamento — dias passados não inventam horas
+  const ehHoje = !dataStr || dataStr === localDateStr() || dataStr === jornadaData;
   const fim = saida || (ehHoje ? { timestamp: new Date().toISOString() } : (retornoAlmoco || entrada));
   let total = (new Date(fim.timestamp) - new Date(entrada.timestamp)) / 3600000;
   if (saidaAlmoco && retornoAlmoco) {
@@ -2544,11 +2612,22 @@ function horasExtras(horasDia) {
   return he;
 }
 
-// Constrói timestamp local de forma segura em todos os browsers (Safari incluso)
-function localTimestamp(dateStr, timeStr) {
-  const [y, mo, d] = dateStr.split('-').map(Number);
-  const [h, m] = timeStr.split(':').map(Number);
-  return new Date(y, mo - 1, d, h, m, 0).toISOString();
+// Horários de uma jornada, em ordem: quando um horário é menor que o anterior, passou da meia-noite
+// (plantão noturno) e vai para o dia seguinte. Retorna null se a jornada passar de 24h.
+function timestampsDaJornada(dataStr, horas) {
+  const [y, mo, d] = dataStr.split('-').map(Number);
+  let dia = 0, anterior = -1;
+  const out = horas.map(h => {
+    if (!h) return null;
+    const [hh, mm] = h.split(':').map(Number);
+    const min = hh * 60 + mm;
+    if (anterior >= 0 && min < anterior) dia++;
+    anterior = min;
+    return new Date(y, mo - 1, d + dia, hh, mm, 0);
+  });
+  const validos = out.filter(Boolean);
+  if (dia > 1 || (validos.length > 1 && validos[validos.length - 1] - validos[0] > 24 * 3600000)) return null;
+  return out.map(t => t && t.toISOString());
 }
 
 function formatHoras(h) {
@@ -2602,7 +2681,7 @@ async function renderDashboard() {
 
   // Registros hoje
   const hoje = localDateStr(now);
-  const hojeRegs = porDia[hoje] || [];
+  const hojeRegs = (jornadaData && jornadaData !== hoje && registrosHoje.length) ? registrosHoje : (porDia[hoje] || []);
 
   // Stats
   document.getElementById('dash-horas').textContent = formatHoras(totalHoras);
@@ -2623,22 +2702,22 @@ async function renderDashboard() {
           <div class="record-time">${new Date(r.timestamp).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}</div>
         </div>`).join('') + '</div>';
     const tipos = hojeRegs.map(r => r.tipo);
-    if (tipos.includes('saida')) document.getElementById('dash-status-hoje').textContent = 'Encerrado';
-    else if (tipos.includes('retorno_almoco') || tipos.includes('entrada')) document.getElementById('dash-status-hoje').textContent = 'Trabalhando';
-    else document.getElementById('dash-status-hoje').textContent = 'Intervalo';
+    const st = tipos.includes('saida') ? 'Encerrado'
+      : (tipos.includes('saida_almoco') && !tipos.includes('retorno_almoco')) ? 'Intervalo' : 'Trabalhando';
+    document.getElementById('dash-status-hoje').textContent = st;
   }
 
   // Progresso
   const chMensal = perfil.carga_horaria_mensal || 220;
-  const diasUteisNoMes = getDiasUteisNoMes(ano, mes);
+  const diasUteisNoMes = diasDeTrabalhoNoMes(ano, mes);
   document.getElementById('prog-horas').textContent = `${formatHoras(totalHoras)} / ${chMensal}h`;
   document.getElementById('prog-horas-bar').style.width = Math.min(100, (totalHoras / chMensal) * 100) + '%';
   document.getElementById('prog-dias').textContent = `${diasTrabalhados} / ${diasUteisNoMes}`;
   document.getElementById('prog-dias-bar').style.width = Math.min(100, (diasTrabalhados / diasUteisNoMes) * 100) + '%';
-  const metaHE = perfil.meta_he_mensal || 40;
+  const metaHE = perfil.meta_he_mensal ?? 40; // 0 = sem meta
   document.getElementById('prog-he').textContent = `${formatHoras(totalHE50 + totalHE100)} / ${metaHE}h`;
-  document.getElementById('prog-he-bar').style.width = Math.min(100, ((totalHE50 + totalHE100) / metaHE) * 100) + '%';
-  document.getElementById('dash-dias-sub').textContent = `de ${diasUteisNoMes} dias úteis`;
+  document.getElementById('prog-he-bar').style.width = (metaHE > 0 ? Math.min(100, ((totalHE50 + totalHE100) / metaHE) * 100) : 0) + '%';
+  document.getElementById('dash-dias-sub').textContent = `de ${diasUteisNoMes} dias de trabalho`;
 
   // Gráfico de horas do mês
   renderGraficoHoras(porDia, diasAbonados, ano, mes, ultimoDia, limite);
@@ -2734,6 +2813,15 @@ function contarDiasMes(ano, mes, sabadoRepouso = null) {
   return { uteis, repousos };
 }
 function getDiasUteisNoMes(ano, mes) { return contarDiasMes(ano, mes).uteis; }
+// Dias com jornada a cumprir no mês (sem domingos, feriados e — na 5x2 — sábados)
+function diasDeTrabalhoNoMes(ano, mes) {
+  let n = 0;
+  for (let d = 1; d <= new Date(ano, mes, 0).getDate(); d++) {
+    const ds = dataStrDe(ano, mes, d);
+    if (ehDiaDeTrabalho(ds) && !ehFeriado(ds)) n++;
+  }
+  return n;
+}
 function fatorDSRMes(ano, mes, sabadoRepouso = null) {
   const { uteis, repousos } = contarDiasMes(ano, mes, sabadoRepouso);
   return uteis > 0 ? repousos / uteis : 0;
@@ -2817,10 +2905,12 @@ async function renderHistorico() {
   let totalHN = 0, totalHE50 = 0, totalHE100 = 0, totalDias = 0;
   const limite = perfil.carga_horaria_diaria || 7.33;
 
+  const hojeHist = localDateStr();
   todasDatas.forEach(data => {
     const ehAbonado = diasAbonados[data] && !porDia[data];
     if (ehAbonado) {
-      if (!ehDiaDeTrabalho(data)) return; // feriado no domingo (ou sábado da 5x2) não é dia de trabalho
+      // feriado no domingo (ou sábado da 5x2) não é dia de trabalho; abono futuro ainda não aconteceu
+      if (!ehDiaDeTrabalho(data) || data > hojeHist) return;
       const ab = diasAbonados[data];
       totalHN += (ab.tipo === 'atestado' && ab.horasParciais != null) ? ab.horasParciais : limite;
       totalDias++;
@@ -2863,9 +2953,10 @@ async function renderHistorico() {
     const h = ehAbonado ? ((abonado.tipo === 'atestado' && abonado.horasParciais != null) ? abonado.horasParciais : limite) : (diaCalc ? diaCalc.h : 0);
     const he = diaCalc ? diaCalc.he50 + diaCalc.he100 : 0;
     const hasAction = regs.length > 0;
+    const especialId = ehAbonado && abonado.id ? abonado.id : null; // feriado/DSR/folga marcado por você
 
     let cls = 'hist-day-cell';
-    if (hasAction) cls += ' clickable';
+    if (hasAction || especialId) cls += ' clickable';
     if (ehHoje) cls += ' day-hoje';
     if (ehFuturo) cls += ' day-future';
     else if (ehAbonado) cls += ' day-abonado';
@@ -2882,7 +2973,8 @@ async function renderHistorico() {
     }
 
     const titleAttr = abonado ? abonado.label : (regs.length ? formatHoras(h) : '');
-    html += `<div class="${cls}" ${hasAction ? `onclick="openEditDay('${dataStr}')"` : ''} title="${titleAttr}">
+    const onclick = hasAction ? `openEditDay('${dataStr}')` : especialId ? `removerDiaEspecial('${especialId}')` : '';
+    html += `<div class="${cls}" ${onclick ? `onclick="${onclick}"` : ''} title="${escapeHtml(titleAttr)}${especialId ? ' — toque para remover a marcação' : ''}">
       <div class="hist-day-num">${dia}</div>
       ${hrsHtml}
     </div>`;
@@ -3153,6 +3245,7 @@ async function renderHolerites() {
 async function loadHolerites() {
   document.getElementById('holerites-list').innerHTML = '<div class="loader"><div class="spinner"></div></div>';
   const { data } = await db.from('holerites').select('*').eq('user_id', activeId()).order('ano', { ascending: false }).order('mes', { ascending: false });
+  holeritesCache = data || [];
   if (!data || !data.length) {
     document.getElementById('holerites-list').innerHTML = '<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>Nenhum holerite salvo</p></div>';
     return;
@@ -3170,10 +3263,30 @@ async function loadHolerites() {
         </div>
       </div>
       <div class="holerite-actions">
-        ${h.arquivo_url ? `<button class="icon-btn" onclick="window.open('${h.arquivo_url}','_blank')"><i class="fas fa-eye"></i></button>` : ''}
+        ${h.arquivo_url ? `<button class="icon-btn" onclick="verHolerite('${h.id}')" title="Ver arquivo"><i class="fas fa-eye"></i></button>` : ''}
         <button class="icon-btn danger" onclick="deletarHolerite('${h.id}')"><i class="fas fa-trash"></i></button>
       </div>
     </div>`).join('');
+}
+
+let holeritesCache = [];
+// Caminho do arquivo no Storage a partir da URL salva
+function caminhoHolerite(url) {
+  const m = String(url || '').match(/\/object\/(?:public|sign|authenticated)\/holerites\/([^?]+)/);
+  return m ? decodeURIComponent(m[1]) : null;
+}
+// Abre o holerite por um link assinado de 1h (funciona com o bucket privado); cai para a URL salva se não der
+async function verHolerite(id) {
+  const h = holeritesCache.find(x => x.id === id);
+  if (!h) return;
+  const janela = window.open('', '_blank'); // abre já no clique, para o navegador não bloquear o pop-up
+  let url = h.arquivo_url;
+  const path = caminhoHolerite(h.arquivo_url);
+  if (path && db.storage.from('holerites').createSignedUrl) {
+    const { data } = await db.storage.from('holerites').createSignedUrl(path, 3600);
+    if (data && data.signedUrl) url = data.signedUrl;
+  }
+  if (janela) janela.location = url; else window.open(url, '_blank');
 }
 
 function handleFileSelect(e) { setUploadFile(e.target.files[0]); }
@@ -3198,9 +3311,13 @@ async function uploadHolerite() {
   const bruto = +document.getElementById('hol-bruto').value || null;
   const liquido = +document.getElementById('hol-liquido').value || null;
   const obs = document.getElementById('hol-obs').value.trim() || null;
+  if (!uploadFile && !bruto && !liquido) { toast('Anexe o PDF ou informe o bruto/líquido', 'error'); return; }
+  if (!(mes >= 1 && mes <= 12) || !(ano >= 2000 && ano <= 2100)) { toast('Mês ou ano inválido', 'error'); return; }
   let arquivo_url = null, arquivo_nome = null;
   if (uploadFile) {
-    const path = `${activeId()}/${ano}-${String(mes).padStart(2,'0')}-${Date.now()}-${uploadFile.name}`;
+    // O Storage recusa acentos, espaços e símbolos no nome do arquivo
+    const nomeSeguro = uploadFile.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^A-Za-z0-9._-]+/g, '_').slice(-80);
+    const path = `${activeId()}/${ano}-${String(mes).padStart(2,'0')}-${Date.now()}-${nomeSeguro}`;
     const { data: upData, error: upErr } = await db.storage.from('holerites').upload(path, uploadFile);
     if (upErr) { toast('Erro ao enviar arquivo: ' + upErr.message, 'error'); return; }
     const { data: urlData } = db.storage.from('holerites').getPublicUrl(path);
@@ -3222,7 +3339,12 @@ async function uploadHolerite() {
 
 async function deletarHolerite(id) {
   if (!confirm('Remover este holerite?')) return;
-  await db.from('holerites').delete().eq('id', id);
+  const h = holeritesCache.find(x => x.id === id);
+  const { error } = await db.from('holerites').delete().eq('id', id);
+  if (error) { toast('Erro ao remover: ' + error.message, 'error'); return; }
+  // Apaga também o PDF do Storage (antes ficava órfão)
+  const path = h && caminhoHolerite(h.arquivo_url);
+  if (path && db.storage.from('holerites').remove) await db.storage.from('holerites').remove([path]);
   toast('Holerite removido', 'info');
   await loadHolerites();
 }
@@ -3289,6 +3411,7 @@ function salvarAdicNoturno() {
   const ativo = document.getElementById('cfg-noturno').checked;
   let pct = +document.getElementById('cfg-noturno-val').value;
   if (!(pct > 0)) pct = 20;
+  if (pct < 20) { pct = 20; toast('O adicional noturno urbano é de no mínimo 20% (CLT art. 73)', 'info'); }
   setAdicNoturnoCfg({ ativo, pct });
   document.getElementById('cfg-noturno-val').value = pct;
   toast('Adicional noturno salvo!', 'success');
@@ -3300,16 +3423,21 @@ async function salvarPerfil() {
     salario_base: +document.getElementById('cfg-salario').value || 0,
     carga_horaria_diaria: +document.getElementById('cfg-ch-diaria').value || 7.33,
     carga_horaria_mensal: +document.getElementById('cfg-ch-mensal').value || 220,
-    percentual_he_50: +document.getElementById('cfg-he50').value || 75,
-    percentual_he_100: +document.getElementById('cfg-he100').value || 100,
+    // Mínimos legais: HE 50% (CF art. 7º XVI) e trabalho em domingo/feriado em dobro (Lei 605/49, Súmula 146 TST)
+    percentual_he_50: Math.max(50, +document.getElementById('cfg-he50').value || 75),
+    percentual_he_100: Math.max(100, +document.getElementById('cfg-he100').value || 100),
     horario_entrada: document.getElementById('cfg-entrada').value,
     horario_saida: document.getElementById('cfg-saida').value,
     intervalo_minutos: +document.getElementById('cfg-intervalo').value || 60,
-    meta_he_mensal: +document.getElementById('cfg-meta-he').value || 40,
+    meta_he_mensal: document.getElementById('cfg-meta-he').value === '' ? 40 : Math.max(0, +document.getElementById('cfg-meta-he').value || 0),
     updated_at: new Date().toISOString()
   };
   const { error } = await db.from('perfis').upsert({ id: activeId(), ...dados });
   if (error) { toast('Erro: ' + error.message, 'error'); return; }
+  if (+document.getElementById('cfg-he50').value < 50 || +document.getElementById('cfg-he100').value < 100)
+    toast('Ajustado ao mínimo legal: HE 50% e domingo/feriado 100%', 'info');
+  document.getElementById('cfg-he50').value = dados.percentual_he_50;
+  document.getElementById('cfg-he100').value = dados.percentual_he_100;
   setEscala(document.getElementById('cfg-escala').value);
   setAdmissao(document.getElementById('cfg-admissao').value);
   perfil = { ...perfil, ...dados };
@@ -3436,7 +3564,7 @@ function workedIntervals(registros, dataStr) {
   const retornoAlmoco = find('retorno_almoco');
   const saida = find('saida');
   if (!entrada) return [];
-  const ehHoje = !dataStr || dataStr === localDateStr();
+  const ehHoje = !dataStr || dataStr === localDateStr() || dataStr === jornadaData;
   const agora = { timestamp: new Date().toISOString() };
   const ints = [];
   if (saidaAlmoco) {
@@ -3501,7 +3629,10 @@ function scheduleReminders() {
   clearReminders();
   if (!remindersOn() || !('Notification' in window) || Notification.permission !== 'granted') return;
   const now = new Date();
-  const plano = [
+  // Folga semanal e feriado não têm lembrete
+  const hojeStr = localDateStr(now);
+  const diaUtil = ehDiaDeTrabalho(hojeStr) && !ehFeriado(hojeStr) && !(diasJustificados || []).some(d => d.data === hojeStr);
+  const plano = !diaUtil ? [] : [
     { time: perfil.horario_entrada || '08:00', msg: 'Hora de registrar sua ENTRADA 🕗' },
     { time: perfil.horario_saida || '17:00', msg: 'Hora de registrar sua SAÍDA 🕔' },
   ];
@@ -3734,6 +3865,36 @@ async function renderAjuda13() {
   else if (r.dDez.irrf === 0 && r.dDez.irrfInfo.impostoTabela > 0) avisos.push('<i class="fas fa-circle-check" style="color:var(--success)"></i> Seu 13º fica <strong>sem Imposto de Renda</strong> pelo redutor da Lei 15.270/2025.');
   if (salBase) avisos.push(`<i class="fas fa-circle-info" style="color:var(--info)"></i> Até ${r.prazoAjuste.texto.replace('até ', '').replace(/ \(.*\)/, '')}, a empresa revisa a média incluindo as horas de dezembro e paga (ou desconta) a diferença.`);
   document.getElementById('aj13-aviso').innerHTML = avisos.join('<br>');
+
+  // Conta passo a passo (antes ficava na área Beta)
+  const h = r.horasJanNov, d = r.dDez, ir = d.irrfInfo;
+  const pct = v => (v * 100).toFixed(1).replace('.', ',') + '%';
+  const sinal = v => (v >= 0 ? '+ ' : '− ') + fmtBRL(Math.abs(v));
+  const deducaoIR = ir.usaSimplificado ? `desconto simplificado ${fmtBRL(ir.simplificado)}`
+    : `INSS ${fmtBRL(ir.inss)}${ir.dependentes ? ` + ${ir.dependentes} dependente${ir.dependentes > 1 ? 's' : ''} ${fmtBRL(ir.deducaoDependentes)}` : ''}`;
+  const inssOn = configDescontos.inss_ativo !== false, irrfOn = configDescontos.irrf_ativo !== false;
+  const passos = [
+    { t: 'Meses e parte fixa', f: `${fmtBRL(salBase)} ÷ 12 × ${avos} = ${fmtBRL(r.fixa)}`,
+      d: `Conta de janeiro a dezembro de ${ano}; cada mês com 15 dias ou mais de trabalho vale 1/12. A projeção considera o ano todo${avos < 12 ? ' a partir da sua admissão' : ''}, como o RH faz ao pagar antes de dezembro acabar.` },
+    { t: 'Média das horas extras e do noturno (jan–nov ÷ 11)',
+      f: `${formatHoras(h.he50h)} HE ${pctHE(50)} + ${formatHoras(h.he100h)} HE ${pctHE(100)} + ${formatHoras(h.noturnasH)} noturno × valor-hora ${fmtBRL(r.vh)} + DSR ${fmtBRL(r.dsrJanNov)} = ${fmtBRL(r.somaJanNov)} ÷ 11 = ${fmtBRL(r.varDez)}`,
+      d: 'Usa as horas registradas no ponto de janeiro a novembro, pelo valor da hora no dia do pagamento (Súmula 347 do TST), com a hora noturna reduzida e o reflexo no descanso semanal remunerado. Meses que ainda não aconteceram entram com as horas já registradas.' },
+    { t: '13º bruto', f: `${fmtBRL(r.fixa)} + ${fmtBRL(r.varDez)} = ${fmtBRL(r.brutoDez)}`, d: 'É o total das duas parcelas antes dos descontos.' },
+    { t: 'INSS do 13º', f: inssOn ? `tabela ${d.inssInfo.ano} sobre ${fmtBRL(r.brutoDez)} = ${fmtBRL(d.inss)}` : 'desativado em Configurações',
+      d: `Calculado separado do salário de dezembro, com a tabela progressiva do ano (${d.inssInfo.norma}).` },
+    { t: 'Imposto de Renda do 13º',
+      f: irrfOn ? `(${fmtBRL(r.brutoDez)} − ${deducaoIR}) = base ${fmtBRL(ir.base)} → ${ir.aliquota ? `× ${pct(ir.aliquota)} − ${fmtBRL(ir.parcelaDeduzir)} = ${fmtBRL(ir.impostoTabela)}` : 'faixa isenta'}${ir.reducao > 0 ? ` − redutor ${fmtBRL(ir.reducao)}` : ''} = ${fmtBRL(d.irrf)}` : 'desativado em Configurações',
+      d: `Tributação exclusiva: o IR do 13º não se soma ao salário. A base desconta o INSS do 13º e os dependentes, ou o desconto simplificado se for melhor.${ir.temRedutor ? ' Desde 2026, o redutor da Lei 15.270/2025 zera o imposto para 13º de até R$ 5.000,00 e reduz até R$ 7.350,00.' : ''}` },
+    { t: '1ª parcela', f: `${fmtBRL(r.brutoDez)} ÷ 2 = ${fmtBRL(r.parcela1)}`, d: `Metade do bruto, sem desconto, ${r.prazoP1.texto}.` },
+    { t: '2ª parcela', f: `${fmtBRL(r.brutoDez)} − ${fmtBRL(r.parcela1)} − ${fmtBRL(d.inss)} − ${fmtBRL(d.irrf)} = ${fmtBRL(r.parcela2)}`, d: `O restante, com INSS e IR, ${r.prazoP2.texto}.` },
+    { t: 'Revisão de janeiro', f: `ano todo ÷ 12 = ${fmtBRL(r.varAno)} → ajuste ${sinal(r.ajusteLiquido)} líquido`,
+      d: `${r.prazoAjuste.texto.charAt(0).toUpperCase() + r.prazoAjuste.texto.slice(1)}, a empresa refaz a média incluindo dezembro e paga ou desconta a diferença.${ano >= new Date().getFullYear() ? ' Dezembro ainda não aconteceu, então ele é projetado pela média e o ajuste fica perto de zero.' : ''}` },
+  ];
+  document.getElementById('aj13-memoria').innerHTML = passos.map((p, i) => `
+    <div class="ajuda-step">
+      <div class="ajuda-step-num">${i + 1}</div>
+      <div class="ajuda-step-text"><strong>${p.t}</strong><br>${p.d}<div class="dt13-mem-formula">${p.f}</div></div>
+    </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -4085,9 +4246,6 @@ function calcDecimoTerceiroBeta() {
   // Horas do ano valorizadas pelo salário-hora da data de pagamento (Súmula 347 TST)
   const valores = dt13MesesDetalhe.map(m => dt13ValorMes(m, salBase));
   const valoresNov = valores.slice(0, 11); // jan–nov: base da média paga em dezembro
-  const vh = valores.length ? valores[0].vh : 0;
-  const div = valores.length ? valores[0].div : 0;
-  const regPag = dt13RegimePagamento();
   const tot = arr => ({ he50: soma(arr, v => v.he.he50h), he100: soma(arr, v => v.he.he100h), not: soma(arr, v => v.he.noturnasH), dsr: soma(arr, v => v.dsr), valor: soma(arr, v => v.valor) });
   const totNov = tot(valoresNov);
   const dezProj = dt13DezProjetado();
@@ -4096,7 +4254,6 @@ function calcDecimoTerceiroBeta() {
     ? { he50: totNov.he50 * 12 / 11, he100: totNov.he100 * 12 / 11, not: totNov.not * 12 / 11, dsr: totNov.dsr * 12 / 11, valor: totNov.valor + valorDezProj }
     : tot(valores);
   if (dezProj) document.getElementById('dt13-he-valor-12').textContent = '≈ ' + fmtBRL(valorDezProj);
-  const nManualHE = valores.filter(v => v.he.manual).length;
 
   const efetivos = dt13MesesDetalhe.map(m => dt13Efetivo(m));
   const meses = efetivos.filter(e => e.contaAvo).length;
@@ -4122,46 +4279,12 @@ function calcDecimoTerceiroBeta() {
   // dezembro = soma do ano ÷ 12. INSS/IRRF/pensão sobre o 13º inteiro; o plano (valor fixo) uma vez só
   const r13 = calc13({ ano, salBase, avos: meses, somaJanNov: totNov.valor, somaAno: totAno.valor,
     outros: bruto => ({ pensao: incluirPensao ? bruto * (pensaoPct / 100) : 0, plano: planoSaude13 }) });
-  const { fixa: decimoTerceiroBase, varDez, varAno, brutoDez, brutoAno, dDez, dAno, parcela1, parcela2, ajusteBruto, ajusteLiquido, prazoAjuste } = r13;
+  const { fixa: decimoTerceiroBase, brutoDez, dDez, dAno, parcela1, parcela2, ajusteLiquido, prazoAjuste } = r13;
   dt13RenderEscalaInfo(salBase, decimoTerceiroBase);
   const inssInfo = dDez.inssInfo, irrfInfo = dDez.irrfInfo;
-  const inssValor = dDez.inss, irrfValor = dDez.irrf, pensao13 = dDez.pensao, outrosTotal = dDez.outros;
+  const inssValor = dDez.inss, irrfValor = dDez.irrf, pensao13 = dDez.pensao;
   const pctTxt = v => (v * 100).toFixed(1).replace('.', ',') + '%';
-  const deducaoIRTxt = ir => ir.usaSimplificado ? `desconto simplificado ${fmtBRL(ir.simplificado)}`
-    : `INSS ${fmtBRL(ir.inss)}${ir.dependentes ? ` + ${ir.dependentes} dependente${ir.dependentes > 1 ? 's' : ''} ${fmtBRL(ir.deducaoDependentes)}` : ''}${ir.pensao ? ` + pensão ${fmtBRL(ir.pensao)}` : ''}`;
-  const horasTxt = t => `${formatHoras(t.he50)} HE ${pctHE(50)} + ${formatHoras(t.he100)} HE ${pctHE(100)} + ${formatHoras(t.not)} noturno`;
-  const hojeMes = new Date().getFullYear() === ano ? new Date().getMonth() + 1 : (ano > new Date().getFullYear() ? 0 : 13);
-  const mesesFuturosNov = Math.max(0, 11 - Math.max(hojeMes, 1) + 1);
 
-  // Memória de cálculo — passo a passo explicativo
-  const passos = [
-    { t: `Meses do 13º (jan–dez/${ano}) e parte fixa`, f: `${fmtBRL(salBase)} ÷ 12 × ${meses} = ${fmtBRL(decimoTerceiroBase)}`,
-      d: `O período é de 1º de janeiro a 31 de dezembro de ${ano} — dezembro do ano anterior já entrou no 13º anterior. Cada mês com 15 dias ou mais trabalhados conta 1/12 (avo). Meses que já passaram usam o ponto${nProjetados ? `; ${nProjetados} ${nProjetados === 1 ? 'mês entra projetado' : 'meses entram projetados'} como trabalhado${nProjetados === 1 ? '' : 's'} (o atual e os seguintes), como o RH faz ao pagar antes de dezembro acabar` : ''}. A troca de escala não muda essa parte — a emenda proíbe reduzir o salário.` },
-    { t: `Média das horas extras e noturno: janeiro a novembro ÷ 11`, f: `${horasTxt(totNov)} × valor-hora ${fmtBRL(vh)} + reflexo no DSR ${fmtBRL(totNov.dsr)} = ${fmtBRL(totNov.valor)} ÷ 11 = ${fmtBRL(varDez)}`,
-      d: `Dezembro ainda não terminou quando a 2ª parcela é paga, então a média das verbas variáveis usa só janeiro a novembro, dividida por 11 (Decreto 57.155/1965, art. 2º). As horas são valorizadas pelo salário-hora da data do pagamento — ${fmtBRL(vh)} = salário ÷ ${div} (${DT13_REGIMES[regPag].nome}) — conforme a Súmula 347 do TST. A hora noturna conta reduzida (52min30s) e o valor inclui o reflexo no descanso semanal remunerado, que também integra o 13º (Súmula 172 e IRR 10169/2023 do TST).${mesesFuturosNov > 0 ? ` Meses até novembro que ainda não aconteceram entram com as horas que você preencher em "Manual" (ou 0h).` : ''}${nManualHE ? ` ${nManualHE} ${nManualHE === 1 ? 'mês com horas preenchidas' : 'meses com horas preenchidas'} manualmente.` : ''}` },
-    { t: `13º bruto pago até dezembro = parte fixa + variáveis`, f: `${fmtBRL(decimoTerceiroBase)} + ${fmtBRL(varDez)} = ${fmtBRL(brutoDez)}`,
-      d: `É o valor que a empresa paga somando as duas parcelas, antes dos descontos.` },
-    { t: `INSS sobre o 13º`, f: inssAtivo ? `tabela ${inssInfo.ano} aplicada sobre ${fmtBRL(brutoDez)} = ${fmtBRL(inssValor)}` : `desativado em Configurações`,
-      d: `O INSS do 13º é calculado separado do salário de dezembro (Lei 8.212/91, art. 28 §7º), com a tabela progressiva do ano (${inssInfo.norma}) — veja as faixas mais abaixo.` },
-    { t: `IRRF sobre o 13º`, f: irrfAtivo ? `(${fmtBRL(brutoDez)} − ${deducaoIRTxt(irrfInfo)}) = base ${fmtBRL(irrfInfo.base)} → ${irrfInfo.aliquota ? `× ${pctTxt(irrfInfo.aliquota)} − ${fmtBRL(irrfInfo.parcelaDeduzir)} = ${fmtBRL(irrfInfo.impostoTabela)}` : 'faixa isenta'}${irrfInfo.reducao > 0 ? ` − redutor ${fmtBRL(irrfInfo.reducao)}` : ''} = ${fmtBRL(irrfValor)}` : `desativado em Configurações`,
-      d: `O 13º tem tributação exclusiva na fonte: o IR é calculado separado do salário, sobre o 13º inteiro. A base desconta o INSS do próprio 13º (e dependentes/pensão), ou o desconto simplificado de ${fmtBRL(irrfInfo.simplificado)} se for melhor para você.${irrfInfo.temRedutor ? ` Desde 2026, o redutor da Lei 15.270/2025 zera o imposto para 13º de até R$ 5.000,00 e reduz até R$ 7.350,00.` : ''}` },
-    { t: `Pensão alimentícia / plano de saúde (se aplicável)`, f: outrosTotal > 0 ? `${fmtBRL(pensao13)} (pensão) + ${fmtBRL(planoSaude13)} (plano de saúde) = ${fmtBRL(outrosTotal)}` : 'nenhum ativado',
-      d: `Diferente do salário mensal, o 13º tem descontos bem restritos por lei. Vale-transporte, vale-refeição/alimentação e parcelas de empréstimo consignado NÃO podem ser descontados do 13º (o próprio eSocial bloqueia esse lançamento) — por isso nem aparecem como opção aqui. Só incluímos pensão alimentícia (com determinação judicial) e plano de saúde (exceção rara, só com previsão em convenção coletiva ou autorização sua expressa).` },
-    { t: `1ª parcela (sem descontos)`, f: `${fmtBRL(brutoDez)} ÷ 2 = ${fmtBRL(parcela1)}`,
-      d: `Metade do 13º bruto, paga como adiantamento — sem nenhum desconto.` },
-    { t: `2ª parcela (com descontos)`, f: `${fmtBRL(brutoDez)} − ${fmtBRL(parcela1)} − ${fmtBRL(inssValor)} − ${fmtBRL(irrfValor)} − ${fmtBRL(outrosTotal)} = ${fmtBRL(parcela2)}`,
-      d: `O restante, já com INSS, IRRF e (se ativados) pensão alimentícia/plano de saúde descontados aqui.` },
-    { t: `Revisão ${prazoAjuste.texto} — inclui dezembro`, f: `${fmtBRL(totAno.valor)} (ano todo) ÷ 12 = ${fmtBRL(varAno)} → 13º bruto ${fmtBRL(brutoAno)} → ajuste ${sinal(ajusteBruto)} bruto (${sinal(ajusteLiquido)} líquido)`,
-      d: `Com dezembro encerrado, a empresa refaz a média das variáveis como 1/12 do total do ano (agora com as horas de dezembro) e paga a diferença na folha de janeiro — ou desconta, se a média caiu. INSS e IRRF são recalculados sobre o 13º total.${dezProj ? ' Como dezembro ainda não aconteceu, as horas dele foram projetadas pela média de janeiro a novembro — por isso o ajuste fica perto de zero. Preencha dezembro em "Manual" na tabela de horas para simular um mês mais forte ou mais fraco.' : ''}` },
-  ];
-  document.getElementById('dt13-memoria').innerHTML = passos.map((p, i) => `
-    <div class="ajuda-step">
-      <div class="ajuda-step-num">${i + 1}</div>
-      <div class="ajuda-step-text">
-        <strong>${p.t}</strong><br>${p.d}
-        <div class="dt13-mem-formula">${p.f}</div>
-      </div>
-    </div>`).join('');
 
   // Parcelas (prazo antecipado quando cai em fim de semana)
   document.getElementById('dt13-p1-data').textContent = prazo13(ano, 11, 30).texto;
@@ -4235,7 +4358,7 @@ function renderGraficoHoras(porDia, diasAbonados, ano, mes, ultimoDia, limite) {
     const ab = diasAbonados[ds];
     let h = 0, tipo = 'vazio';
     if (regs && regs.length) { h = calcHorasDia(regs, ds); tipo = 'trab'; }
-    else if (ab) { h = (ab.tipo === 'atestado' && ab.horasParciais != null) ? ab.horasParciais : limite; tipo = 'abon'; }
+    else if (ab && ds <= hojeStr && ehDiaDeTrabalho(ds)) { h = (ab.tipo === 'atestado' && ab.horasParciais != null) ? ab.horasParciais : limite; tipo = 'abon'; }
     if (h > maxH) maxH = h;
     dias.push({ dia, h, tipo, futuro: ds > hojeStr, hoje: ds === hojeStr });
   }
@@ -4349,7 +4472,8 @@ async function salvarDiaEspecial() {
 }
 
 async function deletarDiaEspecial(id) {
-  await db.from('dias_justificados').delete().eq('id', id);
+  const { error } = await db.from('dias_justificados').delete().eq('id', id);
+  if (error) { toast('Erro ao remover: ' + error.message, 'error'); return; }
   diasJustificados = diasJustificados.filter(d => d.id !== id);
   toast('Marcação removida', 'info');
   await renderHistorico();
@@ -4381,6 +4505,10 @@ async function salvarLancamentoManual() {
   if (!data) { alert('Selecione a data antes de salvar.'); return; }
   if (!entrada) { alert('Horário de entrada é obrigatório.'); return; }
   if (!currentUser) { alert('Sessão expirada. Faça login novamente.'); return; }
+  if (retornoAlmoco && !saidaAlmoco) { alert('Preencha a saída para o almoço antes do retorno.'); return; }
+  if (saidaAlmoco && !retornoAlmoco && saida) { alert('Preencha o retorno do almoço (ou apague a saída para o almoço).'); return; }
+  const tsJornada = timestampsDaJornada(data, [entrada, saidaAlmoco, retornoAlmoco, saida]);
+  if (!tsJornada) { alert('Os horários passam de 24 horas. Confira a ordem: entrada, saída almoço, retorno e saída.'); return; }
 
   btnSalvar.disabled = true;
   btnSalvar.textContent = 'Salvando…';
@@ -4401,18 +4529,14 @@ async function salvarLancamentoManual() {
       if (errDel) { alert('Erro ao remover registros antigos: ' + errDel.message); return; }
     }
 
-    const registros = [
-      { tipo: 'entrada', hora: entrada },
-      saidaAlmoco ? { tipo: 'saida_almoco', hora: saidaAlmoco } : null,
-      retornoAlmoco ? { tipo: 'retorno_almoco', hora: retornoAlmoco } : null,
-      saida ? { tipo: 'saida', hora: saida } : null,
-    ].filter(Boolean);
+    // Horário menor que o anterior = passou da meia-noite (fica registrado no dia seguinte, na mesma jornada)
+    const registros = TIPO_ORDER.map((tipo, i) => tsJornada[i] ? { tipo, timestamp: tsJornada[i] } : null).filter(Boolean);
 
     const inserts = registros.map(r => ({
       user_id: activeId(),
       tipo: r.tipo,
       data,
-      timestamp: localTimestamp(data, r.hora),
+      timestamp: r.timestamp,
       observacao: obs
     }));
 
@@ -4421,6 +4545,7 @@ async function salvarLancamentoManual() {
 
     toast(`${registros.length} registro(s) lançado(s) com sucesso!`, 'success');
     closeModal('modal-lancamento');
+    await loadRegistrosHoje();
     await renderHistorico();
   } catch (err) {
     alert('Erro inesperado: ' + (err.message || String(err)));
@@ -4586,6 +4711,11 @@ async function salvarAtestado() {
   const obs = document.getElementById('atst-obs').value.trim() || null;
   if (!inicio || !fim) { toast('Preencha as datas', 'error'); return; }
   if (fim < inicio) { toast('Data fim não pode ser anterior à data início', 'error'); return; }
+  if (tipo === 'horas_parciais') {
+    if (!(horas > 0)) { toast('Informe quantas horas foram abonadas', 'error'); return; }
+    if (horas > 24) { toast('Horas abonadas não podem passar de 24h', 'error'); return; }
+    if (inicio !== fim) { toast('Atestado de horas parciais vale para um dia só', 'error'); return; }
+  }
   const { error } = await db.from('atestados_medicos').insert({
     user_id: activeId(), tipo, data_inicio: inicio, data_fim: fim,
     horas_abonadas: horas, observacao: obs
@@ -4599,7 +4729,8 @@ async function salvarAtestado() {
 
 function confirmarDelAtestadoModal(id) { delAtestadoId = id; openModal('modal-del-atestado'); }
 async function confirmarDelAtestado() {
-  await db.from('atestados_medicos').delete().eq('id', delAtestadoId);
+  const { error } = await db.from('atestados_medicos').delete().eq('id', delAtestadoId);
+  if (error) { toast('Erro ao remover: ' + error.message, 'error'); return; }
   atestados = atestados.filter(a => a.id !== delAtestadoId);
   renderAtestadosList();
   closeModal('modal-del-atestado');
@@ -4613,7 +4744,7 @@ async function openEditDay(data) {
   editDayDate = data;
   const { data: regs } = await db.from('registros_ponto').select('*')
     .eq('user_id', activeId()).eq('data', data).order('timestamp');
-  editDayRecords = regs || [];
+  editDayRecords = (regs || []).sort((a, b) => TIPO_ORDER.indexOf(a.tipo) - TIPO_ORDER.indexOf(b.tipo));
 
   const d = new Date(data + 'T12:00:00');
   document.getElementById('edit-day-label').textContent =
@@ -4621,8 +4752,8 @@ async function openEditDay(data) {
   document.getElementById('edit-motivo').value = '';
 
   document.getElementById('edit-day-records').innerHTML = editDayRecords.map((r, i) => {
-    const hora = new Date(r.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    const [hh, mm] = hora.split(':');
+    const t = new Date(r.timestamp);
+    const hh = pad2(t.getHours()), mm = pad2(t.getMinutes());
     return `
       <div class="edit-record-row">
         <div class="record-icon ${r.tipo}" style="width:30px;height:30px;font-size:12px"><i class="fas ${TIPO_ICONS[r.tipo]}"></i></div>
@@ -4631,7 +4762,23 @@ async function openEditDay(data) {
       </div>`;
   }).join('');
 
+  // Dia marcado como feriado/DSR/folga: permite desfazer a marcação daqui
+  const esp = diasJustificados.find(dj => dj.data === data);
+  const tipoEsp = { feriado: 'Feriado', dsr: 'DSR', folga: 'Folga' };
+  document.getElementById('edit-day-especial').innerHTML = esp
+    ? `<div class="ajuda-tip" style="justify-content:space-between;align-items:center"><span><i class="fas fa-star"></i> Dia marcado como <strong>${tipoEsp[esp.tipo] || esp.tipo}</strong></span><button class="btn btn-secondary" style="width:auto;padding:5px 10px;font-size:12px" onclick="removerDiaEspecial('${esp.id}', true)">Remover marcação</button></div>`
+    : '';
   openModal('modal-edit-day');
+}
+
+// Desfaz a marcação de feriado/DSR/folga (antes não havia como remover pelo app)
+async function removerDiaEspecial(id, deModal = false) {
+  const esp = diasJustificados.find(d => d.id === id);
+  if (!esp) return;
+  const [y, m, d] = esp.data.split('-');
+  if (!confirm(`Remover a marcação de ${d}/${m}/${y}?`)) return;
+  if (deModal) closeModal('modal-edit-day');
+  await deletarDiaEspecial(id);
 }
 
 async function deletarDia() {
@@ -4641,6 +4788,7 @@ async function deletarDia() {
   if (error) { toast('Erro ao deletar: ' + error.message, 'error'); return; }
   toast('Registros deletados', 'info');
   closeModal('modal-edit-day');
+  await loadRegistrosHoje();
   await renderHistorico();
 }
 
@@ -4648,22 +4796,24 @@ async function salvarEdicao() {
   const motivo = document.getElementById('edit-motivo').value.trim();
   if (!motivo) { toast('Informe o motivo da edição', 'error'); return; }
 
+  const horas = editDayRecords.map((r, i) => document.getElementById(`edit-time-${i}`).value);
+  if (horas.some(h => !h)) { toast('Preencha todos os horários', 'error'); return; }
+  // Mantém a ordem da jornada; horário menor que o anterior = depois da meia-noite (plantão)
+  const novos = timestampsDaJornada(editDayDate, horas);
+  if (!novos) { toast('Os horários passam de 24 horas — confira a ordem', 'error'); return; }
   for (let i = 0; i < editDayRecords.length; i++) {
-    const r = editDayRecords[i];
-    const novoHorario = document.getElementById(`edit-time-${i}`).value;
-    if (!novoHorario) continue;
-    const [hh, mm] = novoHorario.split(':');
-    const novoTimestamp = localTimestamp(editDayDate, `${hh}:${mm}`);
-    await db.from('registros_ponto').update({
-      timestamp: novoTimestamp,
+    const { error } = await db.from('registros_ponto').update({
+      timestamp: novos[i],
       editado: true,
       motivo_edicao: motivo,
       editado_em: new Date().toISOString()
-    }).eq('id', r.id);
+    }).eq('id', editDayRecords[i].id);
+    if (error) { toast('Erro ao salvar: ' + error.message, 'error'); return; }
   }
 
   toast('Registros atualizados!', 'success');
   closeModal('modal-edit-day');
+  await loadRegistrosHoje();
   await renderHistorico();
 }
 
