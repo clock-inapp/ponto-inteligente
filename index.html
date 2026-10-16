@@ -98,6 +98,9 @@
   .nav-item i { width: 18px; text-align: center; font-size: 15px; }
   .nav-item:hover { background: var(--surface2); color: var(--text); }
   .nav-item.active { background: var(--primary-dim); color: var(--primary-light); }
+  .nav-beta-tag { margin-left: auto; font-size: 9px; font-weight: 800; letter-spacing: .04em;
+    background: rgba(167,139,250,.18); color: #a78bfa; border: 1px solid rgba(167,139,250,.35);
+    border-radius: 5px; padding: 1px 6px; }
   .nav-section { font-size: 10px; font-weight: 600; color: var(--text-dim); text-transform: uppercase;
     letter-spacing: .08em; padding: 12px 12px 6px; }
   .sidebar-footer { padding: 12px 8px; border-top: 1px solid var(--border); }
@@ -541,6 +544,31 @@
   .d13-date::before { content: "\f073"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 10px; }
   .d13-value { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
   .d13-note { font-size: 11px; color: var(--text-muted); }
+  /* ───── 13º BETA — PÁGINA DETALHADA ───── */
+  .dt13-explica p { margin: 0 0 10px; }
+  .dt13-explica p:last-child { margin-bottom: 0; }
+  .dt13-explica ul { margin: 0 0 10px 18px; padding: 0; }
+  .dt13-explica li { margin-bottom: 6px; }
+  .dt13-table-wrap { overflow-x: auto; }
+  .dt13-table { width: 100%; border-collapse: collapse; font-size: 12.5px; white-space: nowrap; }
+  .dt13-table th { text-align: left; padding: 9px 12px; font-size: 10.5px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .dt13-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+  .dt13-table tr:last-child td { border-bottom: none; }
+  .dt13-table tr.avo-sim td { color: var(--text); }
+  .dt13-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+  .dt13-avo-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px; }
+  .dt13-avo-badge.sim { background: rgba(34,197,94,.15); color: var(--success); }
+  .dt13-avo-badge.nao { background: var(--surface2); color: var(--text-dim); }
+  .dt13-mem-formula { font-family: ui-monospace, "SF Mono", Consolas, monospace; font-size: 12px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 7px; padding: 8px 11px; margin-top: 6px;
+    color: var(--text-muted); display: inline-block; }
+  .dt13-mem-result { font-weight: 700; color: var(--success); }
+  .dt13-faixa-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0;
+    border-bottom: 1px dashed var(--border); font-size: 12.5px; }
+  .dt13-faixa-row:last-child { border-bottom: none; }
+  .dt13-faixa-row .faixa-desc { color: var(--text-muted); }
+  .dt13-faixa-row .faixa-val { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
   /* ───── BANNER DEMO ───── */
   #demo-banner { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 3000;
     background: var(--primary); color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
@@ -662,6 +690,9 @@
         </button>
         <button class="nav-item" onclick="navigate('atestados')">
           <i class="fas fa-file-medical"></i> Atestados
+        </button>
+        <button class="nav-item" id="nav-decimo-terceiro" style="display:none;color:#a78bfa" onclick="navigate('decimo-terceiro')">
+          <i class="fas fa-gift"></i> 13º Salário <span class="nav-beta-tag">BETA</span>
         </button>
         <div class="nav-section">Sistema</div>
         <button class="nav-item" onclick="navigate('configuracoes')">
@@ -1152,6 +1183,147 @@
                 <div class="loader"><div class="spinner"></div></div>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══ 13º SALÁRIO (BETA) ═══ -->
+      <div class="page" id="page-decimo-terceiro">
+        <div class="card mb-4" style="background:linear-gradient(135deg,rgba(167,139,250,.14),rgba(167,139,250,.04));border-color:rgba(167,139,250,.35)">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:42px;height:42px;border-radius:12px;background:rgba(167,139,250,.18);display:flex;align-items:center;justify-content:center;font-size:18px;color:#a78bfa;flex-shrink:0"><i class="fas fa-flask"></i></div>
+            <div>
+              <div style="font-weight:700;font-size:16px">Área Beta — 13º Salário detalhado</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Esta área é experimental e está visível só para a sua conta enquanto é testada. Os números usam seus dados reais de ponto do ano — nada é alterado ou salvo aqui.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- O que é -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-circle-question" style="color:var(--info)"></i> O que é o 13º salário?</span>
+          </div>
+          <div class="dt13-explica" style="padding:4px 2px 2px;font-size:13px;color:var(--text-muted)">
+            <p>O 13º salário é uma gratificação anual obrigatória para quem trabalha com carteira assinada (CLT), prevista na <strong style="color:var(--text)">Lei nº 4.090/1962</strong> e garantida pela <strong style="color:var(--text)">Constituição Federal, art. 7º, VIII</strong>. Equivale a mais um salário por ano, pago de forma proporcional ao tempo trabalhado.</p>
+            <ul>
+              <li><strong style="color:var(--text)">Quem tem direito:</strong> todo empregado CLT que trabalhou pelo menos 15 dias em um mês — esse mês já conta como <strong>1 avo</strong> (1/12) do 13º.</li>
+              <li><strong style="color:var(--text)">O que entra na conta:</strong> o salário base contratual, somado à <strong>média das verbas variáveis habituais</strong> recebidas ao longo do ano — no seu caso, horas extras (75%/100%) e adicional noturno. A lei não deixa de fora o que você ganhou de extra: ela manda tirar a média do ano.</li>
+              <li><strong style="color:var(--text)">Como é pago:</strong> em até 2 parcelas. A 1ª não tem desconto (é um adiantamento). A 2ª parcela é quando o INSS e o IRRF são efetivamente descontados, sobre o valor total do 13º.</li>
+              <li><strong style="color:var(--text)">Prazos legais:</strong> 1ª parcela entre fevereiro e <strong>30 de novembro</strong>; 2ª parcela até <strong>20 de dezembro</strong>.</li>
+            </ul>
+            <p style="margin-bottom:0">Esta página mostra, passo a passo, exatamente como o ClockIn chega no valor estimado do seu 13º — com os números reais dos seus registros de ponto deste ano.</p>
+          </div>
+        </div>
+
+        <!-- Parâmetros -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-sliders-h" style="color:var(--primary)"></i> Parâmetros</span>
+          </div>
+          <div class="grid-2" style="gap:16px">
+            <div class="input-group" style="margin:0">
+              <label>Ano de referência</label>
+              <input type="text" class="form-control" id="dt13-ano" value="" disabled style="opacity:.8">
+            </div>
+            <div class="input-group" style="margin:0">
+              <label>Salário base (substituir temporariamente)</label>
+              <input type="number" id="dt13-salario-override" class="form-control" placeholder="Deixe vazio p/ usar o salário salvo" oninput="calcDecimoTerceiroBeta()">
+            </div>
+          </div>
+          <div class="slider-group mt-4" style="margin-bottom:0">
+            <div class="slider-label">Meses trabalhados no ano <span id="dt13-meses-val">0 meses</span></div>
+            <input type="range" id="dt13-meses" min="0" max="12" value="0" oninput="this.dataset.touched='1';calcDecimoTerceiroBeta()">
+            <small style="color:var(--text-dim);font-size:11px;display:block;margin-top:6px">Cada mês com 15 dias ou mais trabalhados conta como 1 avo (1/12). Veja o detalhamento mês a mês mais abaixo.</small>
+          </div>
+        </div>
+
+        <!-- Memória de cálculo -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-list-ol" style="color:var(--success)"></i> Memória de cálculo</span>
+          </div>
+          <div id="dt13-memoria"></div>
+        </div>
+
+        <!-- Parcelas -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-calendar-check" style="color:var(--success)"></i> Parcelas e datas de pagamento</span>
+          </div>
+          <div class="d13-parcelas">
+            <div class="d13-card">
+              <div class="d13-card-top">
+                <span class="d13-badge">1ª parcela</span>
+                <span class="d13-date" id="dt13-p1-data">até 30/11</span>
+              </div>
+              <div class="d13-value" id="dt13-p1-valor">R$ 0,00</div>
+              <div class="d13-note">50% do 13º bruto, sem nenhum desconto</div>
+            </div>
+            <div class="d13-card">
+              <div class="d13-card-top">
+                <span class="d13-badge alt">2ª parcela</span>
+                <span class="d13-date" id="dt13-p2-data">até 20/12</span>
+              </div>
+              <div class="d13-value" id="dt13-p2-valor">R$ 0,00</div>
+              <div class="d13-note">50% menos INSS e IRRF (calculados sobre o 13º inteiro)</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detalhamento mensal -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-calendar-alt" style="color:var(--info)"></i> Detalhamento mês a mês (<span id="dt13-ano-tabela"></span>)</span>
+          </div>
+          <div class="dt13-table-wrap">
+            <table class="dt13-table">
+              <thead>
+                <tr>
+                  <th>Mês</th><th class="num">Dias c/ registro</th><th class="num">HE 75%</th>
+                  <th class="num">HE 100%</th><th class="num">Noturno</th><th>Conta avo?</th>
+                </tr>
+              </thead>
+              <tbody id="dt13-mensal-body">
+                <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* "Conta avo" é uma estimativa (≥ 15 dias com registro ou abonados no mês). A regra legal exata também considera a data de admissão/demissão, que o app ainda não registra.</small>
+        </div>
+
+        <!-- Descontos -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-minus-circle" style="color:var(--danger)"></i> Descontos sobre o 13º (2ª parcela)</span>
+          </div>
+          <div class="grid-2" style="gap:20px">
+            <div>
+              <div class="sim-section-title"><i class="fas fa-file-invoice"></i> INSS — tabela progressiva 2024</div>
+              <div id="dt13-inss-faixas"></div>
+              <div class="sim-row" style="font-weight:700"><div class="label">Total INSS</div><div class="value negative" id="dt13-inss-total">R$ 0,00</div></div>
+            </div>
+            <div>
+              <div class="sim-section-title"><i class="fas fa-file-invoice-dollar"></i> IRRF — tabela progressiva 2024</div>
+              <div id="dt13-irrf-detalhe"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resumo final -->
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-receipt" style="color:var(--primary)"></i> Resumo final</span>
+          </div>
+          <div class="sim-row"><div class="label">13º salário bruto (base + variáveis)</div><div class="value positive" id="dt13-bruto">R$ 0,00</div></div>
+          <div class="sim-row"><div class="label">(−) INSS</div><div class="value negative" id="dt13-resumo-inss">R$ 0,00</div></div>
+          <div class="sim-row"><div class="label">(−) IRRF</div><div class="value negative" id="dt13-resumo-irrf">R$ 0,00</div></div>
+          <div class="sim-total mt-4">
+            <div class="label"><i class="fas fa-hand-holding-usd"></i> 13º Líquido Estimado</div>
+            <div class="value" id="dt13-liquido">R$ 0,00</div>
+          </div>
+          <div style="margin-top:12px;font-size:11px;color:var(--text-dim);text-align:center">
+            * Estimativa educativa. Não substitui o cálculo oficial do RH/contabilidade da sua empresa — dependentes no IRRF, acordos coletivos e outras verbas não estão incluídos.
           </div>
         </div>
       </div>
@@ -1792,6 +1964,9 @@ let currentUser = null;
 let perfil = {};
 let configDescontos = {};
 let isAdmin = false;
+// Área Beta (13º Salário) — liberada somente para contas desta lista, enquanto em teste
+const BETA_13_EMAILS = ['khevenhenriquelimasantos443@gmail.com'];
+let isBeta13 = false;
 let viewingAsUser = null; // { id, nome } quando admin visualiza outro usuário
 let _savedPerfil = null, _savedConfig = null, _savedExtras = null;
 let simAjustes = []; // variáveis manuais (+/-) da Simulação, não persistidas no banco
@@ -1881,6 +2056,10 @@ async function loadUserData() {
   const { data: adminRow } = await db.from('admins').select('user_id').eq('user_id', currentUser.id).single();
   isAdmin = !!adminRow;
   document.getElementById('nav-admin').style.display = isAdmin ? 'flex' : 'none';
+
+  // Área Beta — 13º Salário (liberada só para a lista de e-mails de teste)
+  isBeta13 = !!(currentUser.email && BETA_13_EMAILS.includes(currentUser.email.toLowerCase()));
+  document.getElementById('nav-decimo-terceiro').style.display = isBeta13 ? 'flex' : 'none';
 }
 
 function updateUserUI() {
@@ -1950,9 +2129,10 @@ async function doAppleLogin() {
 async function doLogout() {
   await db.auth.signOut();
   clearReminders();
-  currentUser = null; perfil = {}; configDescontos = {}; descontosExtras = []; registrosHoje = []; isAdmin = false;
+  currentUser = null; perfil = {}; configDescontos = {}; descontosExtras = []; registrosHoje = []; isAdmin = false; isBeta13 = false;
   viewingAsUser = null; _savedPerfil = null; _savedConfig = null; _savedExtras = null;
   document.getElementById('nav-admin').style.display = 'none';
+  document.getElementById('nav-decimo-terceiro').style.display = 'none';
   document.getElementById('admin-view-banner').classList.remove('visible');
   document.body.classList.remove('admin-view-mode');
 }
@@ -1963,10 +2143,12 @@ async function doLogout() {
 const pageTitles = {
   dashboard: 'Dashboard', ponto: 'Bater Ponto', historico: 'Histórico',
   simulacao: 'Simulação Salarial', holerites: 'Holerites',
-  atestados: 'Atestados Médicos', configuracoes: 'Configurações', ajuda: 'Ajuda', admin: 'Painel Admin'
+  atestados: 'Atestados Médicos', configuracoes: 'Configurações', ajuda: 'Ajuda', admin: 'Painel Admin',
+  'decimo-terceiro': '13º Salário (Beta)'
 };
 
 async function navigate(page) {
+  if (page === 'decimo-terceiro' && !isBeta13) { page = 'dashboard'; }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
@@ -1984,6 +2166,7 @@ async function navigate(page) {
   if (page === 'atestados') await renderAtestados();
   if (page === 'configuracoes') renderConfiguracoes();
   if (page === 'admin') await renderAdmin();
+  if (page === 'decimo-terceiro') await renderDecimoTerceiroBeta();
 }
 
 function toggleSidebar() {
@@ -2424,36 +2607,47 @@ function changeMonth(delta) {
 // ═══════════════════════════════════════════════════════════
 // CÁLCULO SALARIAL
 // ═══════════════════════════════════════════════════════════
+const TETO_INSS_2024 = 7786.02; // acima disso não há contribuição adicional
+const TABELA_INSS_2024 = [[1412.00, 0.075], [2666.68, 0.09], [4000.03, 0.12], [7786.02, 0.14]];
+const TABELA_IRRF_2024 = [
+  [2259.20, 0, 0],
+  [2826.65, 0.075, 169.44],
+  [3751.05, 0.15, 381.44],
+  [4664.68, 0.225, 662.77],
+  [Infinity, 0.275, 896.00]
+];
+
+// Breakdown faixa a faixa — usado pela simulação simples e pela área detalhada do 13º
+function calcINSSDetalhado(bruto) {
+  const base = Math.min(bruto, TETO_INSS_2024);
+  const faixas = [];
+  let total = 0, anterior = 0;
+  for (const [limite, aliq] of TABELA_INSS_2024) {
+    if (base <= limite) { const v = (base - anterior) * aliq; faixas.push({ de: anterior, ate: base, aliq, valor: v }); total += v; break; }
+    const v = (limite - anterior) * aliq; faixas.push({ de: anterior, ate: limite, aliq, valor: v }); total += v; anterior = limite;
+  }
+  return { total, faixas, teto: TETO_INSS_2024, acimaDoTeto: bruto > TETO_INSS_2024 };
+}
+
+function calcIRRFDetalhado(base) {
+  for (const [lim, aliq, deducao] of TABELA_IRRF_2024) {
+    if (base <= lim) {
+      const valorBruto = base * aliq;
+      const valor = Math.max(0, valorBruto - deducao);
+      return { base, aliquota: aliq, deducao, valorBruto, valor, isento: aliq === 0 };
+    }
+  }
+  return { base, aliquota: 0, deducao: 0, valorBruto: 0, valor: 0, isento: true };
+}
+
 function calcINSS(bruto) {
   if (!configDescontos.inss_ativo) return 0;
-  const teto = 7786.02; // teto do INSS 2024 — acima disso não há contribuição adicional
-  const base = Math.min(bruto, teto);
-  const tabela = [
-    [1412.00, 0.075], [2666.68, 0.09], [4000.03, 0.12], [7786.02, 0.14]
-  ];
-  let inss = 0, anterior = 0;
-  for (const [limite, aliq] of tabela) {
-    if (base <= limite) { inss += (base - anterior) * aliq; break; }
-    inss += (limite - anterior) * aliq;
-    anterior = limite;
-  }
-  return inss;
+  return calcINSSDetalhado(bruto).total;
 }
 
 function calcIRRF(brutoLiquidoINSS) {
   if (!configDescontos.irrf_ativo) return 0;
-  const base = brutoLiquidoINSS;
-  const tabela = [
-    [2259.20, 0, 0],
-    [2826.65, 0.075, 169.44],
-    [3751.05, 0.15, 381.44],
-    [4664.68, 0.225, 662.77],
-    [Infinity, 0.275, 896.00]
-  ];
-  for (const [lim, aliq, deducao] of tabela) {
-    if (base <= lim) return Math.max(0, base * aliq - deducao);
-  }
-  return 0;
+  return calcIRRFDetalhado(brutoLiquidoINSS).valor;
 }
 
 function calcSalario(salarioOverride = null, he50h = 0, he100h = 0, ano = null, mes = null, ajustesManuais = [], noturnasH = 0) {
@@ -3018,6 +3212,177 @@ function render13Ferias() {
   document.getElementById('res-ferias-base').textContent = fmtBRL(feriasBase);
   document.getElementById('res-ferias-terco').textContent = fmtBRL(tercoFerias);
   document.getElementById('res-ferias-total').textContent = fmtBRL(feriasTotal);
+}
+
+// ═══════════════════════════════════════════════════════════
+// 13º SALÁRIO — ÁREA BETA DETALHADA (visível só para BETA_13_EMAILS)
+// ═══════════════════════════════════════════════════════════
+let dt13MesesDetalhe = [];
+
+// Para cada mês do ano: dias com registro de ponto, HE 75%/100% e noturno daquele mês,
+// e se o mês conta como avo (estimativa: ≥15 dias com ponto ou abonado)
+async function calcDetalhamentoMensalAno(ano) {
+  const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+  const { data: registros } = await db.from('registros_ponto').select('*')
+    .eq('user_id', activeId())
+    .gte('data', `${ano}-01-01`).lte('data', `${ano}-12-31`)
+    .order('timestamp');
+  const porDia = {};
+  (registros || []).forEach(r => { (porDia[r.data] = porDia[r.data] || []); porDia[r.data].push(r); });
+
+  const chMensal = perfil.carga_horaria_mensal || 220;
+  const valorHora = chMensal > 0 ? (perfil.salario_base || 0) / chMensal : 0;
+  const pHE50 = (perfil.percentual_he_50 || 75) / 100;
+  const pHE100 = (perfil.percentual_he_100 || 100) / 100;
+  const adicCfg = getAdicNoturnoCfg();
+  const pNoturno = adicCfg.ativo ? (adicCfg.pct || 0) / 100 : 0;
+
+  const meses = [];
+  for (let mi = 1; mi <= 12; mi++) {
+    const diasAbonados = getDiasAbonados(ano, mi);
+    const ultimoDia = new Date(ano, mi, 0).getDate();
+    let diasConsiderados = 0, he50h = 0, he100h = 0, noturnasH = 0;
+    for (let dia = 1; dia <= ultimoDia; dia++) {
+      const ds = `${ano}-${String(mi).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+      const regs = porDia[ds];
+      if (regs && regs.length) {
+        diasConsiderados++;
+        const h = calcHorasDia(regs, ds);
+        const he = horasExtras(h);
+        const dow = new Date(ano, mi - 1, dia).getDay();
+        if (dow === 0) he100h += he; else he50h += he;
+        noturnasH += calcHorasNoturnas(regs, ds);
+      } else if (diasAbonados[ds]) {
+        diasConsiderados++;
+      }
+    }
+    const valorVariavel = he50h * valorHora * (1 + pHE50) + he100h * valorHora * (1 + pHE100) + noturnasH * valorHora * pNoturno;
+    meses.push({ mes: mi, nome: nomesMeses[mi - 1], diasConsiderados, he50h, he100h, noturnasH, valorVariavel, contaAvo: diasConsiderados >= 15 });
+  }
+  return meses;
+}
+
+async function renderDecimoTerceiroBeta() {
+  if (!isBeta13) return;
+  const ano = new Date().getFullYear();
+  document.getElementById('dt13-ano').value = ano;
+  document.getElementById('dt13-ano-tabela').textContent = ano;
+  const mesesEl = document.getElementById('dt13-meses');
+  if (mesesEl && !mesesEl.dataset.touched) mesesEl.value = new Date().getMonth() + 1;
+  document.getElementById('dt13-mensal-body').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>';
+  dt13MesesDetalhe = await calcDetalhamentoMensalAno(ano);
+  renderDt13Mensal();
+  calcDecimoTerceiroBeta();
+}
+
+function renderDt13Mensal() {
+  document.getElementById('dt13-mensal-body').innerHTML = dt13MesesDetalhe.map(m => `
+    <tr class="${m.contaAvo ? 'avo-sim' : ''}">
+      <td>${m.nome}</td>
+      <td class="num">${m.diasConsiderados}</td>
+      <td class="num">${formatHoras(m.he50h)}</td>
+      <td class="num">${formatHoras(m.he100h)}</td>
+      <td class="num">${formatHoras(m.noturnasH)}</td>
+      <td>${m.contaAvo ? '<span class="dt13-avo-badge sim">1/12 ✓</span>' : '<span class="dt13-avo-badge nao">—</span>'}</td>
+    </tr>`).join('');
+}
+
+function calcDecimoTerceiroBeta() {
+  if (!isBeta13) return;
+  const mesesEl = document.getElementById('dt13-meses');
+  if (!mesesEl) return;
+  const meses = Math.max(0, Math.min(12, +mesesEl.value || 0));
+  document.getElementById('dt13-meses-val').textContent = meses + (meses === 1 ? ' mês' : ' meses');
+  const ano = new Date().getFullYear();
+  const salOverride = document.getElementById('dt13-salario-override').value;
+  const salBase = salOverride ? +salOverride : (perfil.salario_base || 0);
+  const chMensal = perfil.carga_horaria_mensal || 220;
+
+  const valorVariavelAno = dt13MesesDetalhe.reduce((s, m) => s + m.valorVariavel, 0);
+  const he50hAno = dt13MesesDetalhe.reduce((s, m) => s + m.he50h, 0);
+  const he100hAno = dt13MesesDetalhe.reduce((s, m) => s + m.he100h, 0);
+  const noturnasHAno = dt13MesesDetalhe.reduce((s, m) => s + m.noturnasH, 0);
+
+  const decimoTerceiroBase = salBase / 12 * meses;
+  const decimoTerceiroVariavel = valorVariavelAno / 12;
+  const decimoTerceiro = decimoTerceiroBase + decimoTerceiroVariavel;
+
+  const inssInfo = calcINSSDetalhado(decimoTerceiro);
+  const irrfInfo = calcIRRFDetalhado(decimoTerceiro - inssInfo.total);
+  const inssAtivo = configDescontos.inss_ativo !== false;
+  const irrfAtivo = configDescontos.irrf_ativo !== false;
+  const inssValor = inssAtivo ? inssInfo.total : 0;
+  const irrfValor = irrfAtivo ? irrfInfo.valor : 0;
+
+  const parcela1 = decimoTerceiro / 2;
+  const parcela2 = Math.max(0, decimoTerceiro / 2 - inssValor - irrfValor);
+  const liquido = Math.max(0, decimoTerceiro - inssValor - irrfValor);
+
+  // Memória de cálculo — passo a passo explicativo
+  const passos = [
+    { t: `Salário base ÷ 12 × meses trabalhados`, f: `${fmtBRL(salBase)} ÷ 12 × ${meses} = ${fmtBRL(decimoTerceiroBase)}`,
+      d: `Essa é a parte "fixa" do seu 13º: cada mês trabalhado dá direito a 1/12 do salário contratual.` },
+    { t: `Média de horas extras + adicional noturno do ano ÷ 12`, f: `${fmtBRL(valorVariavelAno)} (total do ano) ÷ 12 = ${fmtBRL(decimoTerceiroVariavel)}`,
+      d: `A lei manda incluir a média das verbas variáveis habituais no 13º. Somamos tudo que foi pago de HE 75%/100% e adicional noturno nos 12 meses (${formatHoras(he50hAno)} em HE 75%, ${formatHoras(he100hAno)} em HE 100%, ${formatHoras(noturnasHAno)} de noturno) e dividimos por 12.` },
+    { t: `13º bruto = base + variáveis`, f: `${fmtBRL(decimoTerceiroBase)} + ${fmtBRL(decimoTerceiroVariavel)} = ${fmtBRL(decimoTerceiro)}`,
+      d: `Esse é o valor total do seu 13º salário antes de qualquer desconto.` },
+    { t: `INSS sobre o 13º`, f: inssAtivo ? `tabela progressiva 2024 aplicada sobre ${fmtBRL(decimoTerceiro)} = ${fmtBRL(inssValor)}` : `desativado em Configurações`,
+      d: `O INSS do 13º é calculado separadamente do salário mensal, usando a mesma tabela progressiva — veja o detalhamento por faixa mais abaixo.` },
+    { t: `IRRF sobre o 13º`, f: irrfAtivo ? `tabela progressiva 2024 aplicada sobre (${fmtBRL(decimoTerceiro)} − ${fmtBRL(inssValor)}) = ${fmtBRL(irrfValor)}` : `desativado em Configurações`,
+      d: `O IRRF também incide separadamente sobre o 13º, depois de descontar o INSS do próprio 13º.` },
+    { t: `1ª parcela (sem descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 = ${fmtBRL(parcela1)}`,
+      d: `Metade do 13º bruto, paga como adiantamento — sem desconto de INSS/IRRF.` },
+    { t: `2ª parcela (com descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 − ${fmtBRL(inssValor)} − ${fmtBRL(irrfValor)} = ${fmtBRL(parcela2)}`,
+      d: `A outra metade, já com INSS e IRRF do 13º inteiro descontados aqui.` },
+  ];
+  document.getElementById('dt13-memoria').innerHTML = passos.map((p, i) => `
+    <div class="ajuda-step">
+      <div class="ajuda-step-num">${i + 1}</div>
+      <div class="ajuda-step-text">
+        <strong>${p.t}</strong><br>${p.d}
+        <div class="dt13-mem-formula">${p.f}</div>
+      </div>
+    </div>`).join('');
+
+  // Parcelas
+  document.getElementById('dt13-p1-data').textContent = `até 30/11/${ano}`;
+  document.getElementById('dt13-p2-data').textContent = `até 20/12/${ano}`;
+  document.getElementById('dt13-p1-valor').textContent = fmtBRL(parcela1);
+  document.getElementById('dt13-p2-valor').textContent = fmtBRL(parcela2);
+
+  // INSS por faixa
+  if (!inssAtivo) {
+    document.getElementById('dt13-inss-faixas').innerHTML = '<div class="empty-state" style="padding:14px"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>INSS desativado em Configurações</p></div>';
+  } else {
+    document.getElementById('dt13-inss-faixas').innerHTML = inssInfo.faixas.map(fx => `
+      <div class="dt13-faixa-row">
+        <div class="faixa-desc">${fmtBRL(fx.de)} a ${fmtBRL(fx.ate)} <span style="color:var(--text-dim)">(${(fx.aliq * 100).toFixed(1)}%)</span></div>
+        <div class="faixa-val">${fmtBRL(fx.valor)}</div>
+      </div>`).join('') + (inssInfo.acimaDoTeto ? `<div style="font-size:11px;color:var(--text-dim);margin-top:8px"><i class="fas fa-info-circle"></i> Valor acima do teto do INSS (${fmtBRL(inssInfo.teto)}) não gera contribuição adicional.</div>` : '');
+  }
+  document.getElementById('dt13-inss-total').textContent = '- ' + fmtBRL(inssValor);
+
+  // IRRF detalhado
+  if (!irrfAtivo) {
+    document.getElementById('dt13-irrf-detalhe').innerHTML = '<div class="empty-state" style="padding:14px"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>IRRF desativado em Configurações</p></div>';
+  } else if (irrfInfo.isento) {
+    document.getElementById('dt13-irrf-detalhe').innerHTML = `
+      <div class="dt13-faixa-row"><div class="faixa-desc">Base de cálculo: ${fmtBRL(irrfInfo.base)}</div><div class="faixa-val" style="color:var(--success)">Isento</div></div>
+      <div class="sim-row" style="font-weight:700"><div class="label">Total IRRF</div><div class="value negative">- ${fmtBRL(0)}</div></div>`;
+  } else {
+    document.getElementById('dt13-irrf-detalhe').innerHTML = `
+      <div class="dt13-faixa-row"><div class="faixa-desc">Base de cálculo (13º − INSS)</div><div class="faixa-val">${fmtBRL(irrfInfo.base)}</div></div>
+      <div class="dt13-faixa-row"><div class="faixa-desc">Alíquota da faixa</div><div class="faixa-val">${(irrfInfo.aliquota * 100).toFixed(1)}%</div></div>
+      <div class="dt13-faixa-row"><div class="faixa-desc">${fmtBRL(irrfInfo.base)} × ${(irrfInfo.aliquota * 100).toFixed(1)}%</div><div class="faixa-val">${fmtBRL(irrfInfo.valorBruto)}</div></div>
+      <div class="dt13-faixa-row"><div class="faixa-desc">(−) Parcela a deduzir</div><div class="faixa-val">${fmtBRL(irrfInfo.deducao)}</div></div>
+      <div class="sim-row" style="font-weight:700"><div class="label">Total IRRF</div><div class="value negative">- ${fmtBRL(irrfValor)}</div></div>`;
+  }
+
+  // Resumo final
+  document.getElementById('dt13-bruto').textContent = fmtBRL(decimoTerceiro);
+  document.getElementById('dt13-resumo-inss').textContent = '- ' + fmtBRL(inssValor);
+  document.getElementById('dt13-resumo-irrf').textContent = '- ' + fmtBRL(irrfValor);
+  document.getElementById('dt13-liquido').textContent = fmtBRL(liquido);
 }
 
 // ═══════════════════════════════════════════════════════════
