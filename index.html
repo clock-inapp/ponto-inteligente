@@ -114,7 +114,7 @@
   .btn-logout:hover { color: var(--danger); background: rgba(239,68,68,.1); }
 
   /* ───── MAIN CONTENT ───── */
-  .main { flex: 1; margin-left: var(--sidebar-w); min-height: 100vh; }
+  .main { flex: 1; min-width: 0; margin-left: var(--sidebar-w); min-height: 100vh; }
   .topbar {
     position: -webkit-sticky; position: sticky; top: 0; z-index: 50; background: rgba(15,23,42,0.9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border); padding: 0 24px; height: 60px;
@@ -129,7 +129,7 @@
 
   /* ───── CARDS ───── */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
   .card-title { font-size: 15px; font-weight: 600; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
@@ -572,6 +572,20 @@
   .dt13-dia-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text);
     font-size: 12px; font-family: inherit; border-radius: 6px; padding: 4px 8px; cursor: pointer; }
   .dt13-dia-select:focus { outline: 1px solid var(--primary); }
+  .dt13-table tfoot td { border-top: 1px solid var(--border); border-bottom: none; padding-top: 10px; }
+  .dt13-regime-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 5px; white-space: nowrap; }
+  .dt13-regime-badge.r-6x1-44 { background: var(--surface2); color: var(--text-muted); }
+  .dt13-regime-badge.r-5x2-42 { background: rgba(245,158,11,.15); color: var(--warning); }
+  .dt13-regime-badge.r-5x2-40 { background: rgba(167,139,250,.18); color: #a78bfa; }
+  .dt13-hora-input { width: 74px; background: var(--bg); border: 1px solid var(--primary); color: var(--text);
+    font-size: 12px; font-family: inherit; border-radius: 6px; padding: 4px 7px; text-align: right; }
+  .dt13-hora-input:focus { outline: 1px solid var(--primary-light); }
+  .dt13-comp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  .dt13-comp-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .dt13-comp-card.ativo { border-color: #a78bfa; box-shadow: 0 0 0 1px rgba(167,139,250,.35) inset; }
+  .dt13-comp-card .c-tit { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+  .dt13-comp-card .c-val { font-size: 19px; font-weight: 800; color: var(--text); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .dt13-comp-card .c-sub { font-size: 11px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
   /* ───── BANNER DEMO ───── */
   #demo-banner { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 3000;
     background: var(--primary); color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
@@ -1197,7 +1211,7 @@
             <div style="width:42px;height:42px;border-radius:12px;background:rgba(167,139,250,.18);display:flex;align-items:center;justify-content:center;font-size:18px;color:#a78bfa;flex-shrink:0"><i class="fas fa-flask"></i></div>
             <div>
               <div style="font-weight:700;font-size:16px">Área Beta — 13º Salário detalhado</div>
-              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Esta área é experimental e está visível só para a sua conta enquanto é testada. Os números usam seus dados reais de ponto do ano — nada é alterado ou salvo aqui.</div>
+              <div style="font-size:12px;color:var(--text-muted);margin-top:2px">Esta área é experimental e está visível só para a sua conta enquanto é testada. Os números usam seus dados reais de ponto do ano — nada no seu ponto é alterado; os ajustes manuais desta página ficam salvos só neste navegador.</div>
             </div>
           </div>
         </div>
@@ -1227,11 +1241,11 @@
           <div class="grid-2" style="gap:16px">
             <div class="input-group" style="margin:0">
               <label>Ano de referência</label>
-              <input type="text" class="form-control" id="dt13-ano" value="" disabled style="opacity:.8">
+              <select class="form-control" id="dt13-ano" onchange="loadDt13Ano(+this.value)"></select>
             </div>
             <div class="input-group" style="margin:0">
               <label>Salário base (substituir temporariamente)</label>
-              <input type="number" id="dt13-salario-override" class="form-control" placeholder="Deixe vazio p/ usar o salário salvo" oninput="calcDecimoTerceiroBeta()">
+              <input type="number" id="dt13-salario-override" class="form-control" placeholder="Deixe vazio p/ usar o salário salvo" oninput="dt13Refresh()">
             </div>
           </div>
           <div class="mt-4" style="background:var(--primary-dim);border:1px solid var(--primary);border-radius:9px;padding:12px 14px">
@@ -1239,8 +1253,44 @@
               <i class="fas fa-calculator"></i> Meses computados para o 13º (avos)
             </div>
             <div style="font-size:22px;font-weight:800;color:var(--primary-light)" id="dt13-meses-computados">0 de 12</div>
-            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Calculado a partir da tabela "Detalhamento mês a mês" abaixo — ajuste mês a mês lá se algum mês não tiver registro de ponto mas você tiver trabalhado normalmente.</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Calculado a partir da tabela "Dias trabalhados mês a mês" abaixo — ajuste mês a mês lá se algum mês não tiver registro de ponto mas você tiver trabalhado normalmente.</div>
           </div>
+        </div>
+
+        <!-- Escala de trabalho (EC 141/2026) -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-business-time" style="color:#a78bfa"></i> Escala de trabalho — fim da 6x1 (EC 141/2026)</span>
+          </div>
+          <div class="dt13-explica" style="padding:0 2px 12px;font-size:12.5px;color:var(--text-muted)">
+            <p>A <strong style="color:var(--text)">Emenda Constitucional 141/2026</strong> (origem: PEC 221/2019) acaba com a escala 6x1 e torna a <strong style="color:var(--text)">5x2</strong> a regra geral. Principais pontos:</p>
+            <ul>
+              <li><strong style="color:var(--text)">2 dias de descanso semanal remunerado</strong>, um deles preferencialmente no domingo.</li>
+              <li><strong style="color:var(--text)">Jornada semanal máxima</strong> cai de 44h → <strong>42h</strong> (60 dias após a promulgação) → <strong>40h</strong> (12 meses depois da 1ª etapa). O limite de 8h por dia continua.</li>
+              <li><strong style="color:var(--text)">Sem redução de salário</strong> nem de piso da categoria. Como o salário é o mesmo e as horas diminuem, o <strong>valor da sua hora sobe</strong> (divisor mensal 220h → 210h → 200h) — e cada hora extra passa a valer mais, inclusive na média do 13º.</li>
+              <li><strong style="color:var(--text)">Quem já trabalha 40h ou menos</strong> não muda de carga horária, mas passa a ter as 2 folgas garantidas.</li>
+              <li><strong style="color:var(--text)">Acordo coletivo</strong> pode calcular as 2 folgas pela média do mês (setores contínuos: comércio, saúde, transporte…), mas nunca mais de 7 dias seguidos sem folga.</li>
+              <li><strong style="color:var(--text)">Exceções:</strong> servidores públicos (regras próprias) e empregados com diploma de nível superior e salário ≥ R$ 21.188,00 (2,5× o teto do INSS) não seguem o limite de jornada — mas mantêm as 2 folgas. MEIs/microempresas podem ter regras de transição por lei complementar futura.</li>
+            </ul>
+          </div>
+          <div class="grid-2" style="gap:16px">
+            <div class="input-group" style="margin:0">
+              <label>Escala usada no cálculo</label>
+              <select class="form-control" id="dt13-escala" onchange="dt13SaveStore();dt13Refresh()">
+                <option value="auto">Automático — segue o cronograma da EC 141/2026</option>
+                <option value="6x1-44">6x1 — 44h semanais (regra antiga, sábado é dia útil)</option>
+                <option value="5x2-42">5x2 — 42h semanais (1ª etapa da transição)</option>
+                <option value="5x2-40">5x2 — 40h semanais (regra definitiva)</option>
+              </select>
+            </div>
+            <div class="input-group" style="margin:0">
+              <label>Data de promulgação/publicação da EC</label>
+              <input type="date" class="form-control" id="dt13-promulgacao" value="2026-10-16" onchange="dt13SaveStore();dt13Refresh()">
+            </div>
+          </div>
+          <div id="dt13-fases-info" style="font-size:11.5px;color:var(--text-muted);margin-top:10px"></div>
+          <div class="sim-section-title mt-4" style="margin-bottom:8px"><i class="fas fa-scale-balanced"></i> Mesmas horas extras do ano, em cada regime</div>
+          <div class="dt13-comp-grid" id="dt13-comp-regimes"></div>
         </div>
 
         <!-- Memória de cálculo -->
@@ -1276,25 +1326,61 @@
           </div>
         </div>
 
-        <!-- Detalhamento mensal -->
+        <!-- Dias trabalhados mês a mês -->
         <div class="card mb-4">
           <div class="card-header">
-            <span class="card-title"><i class="fas fa-calendar-alt" style="color:var(--info)"></i> Detalhamento mês a mês (<span id="dt13-ano-tabela"></span>)</span>
+            <span class="card-title"><i class="fas fa-calendar-alt" style="color:var(--info)"></i> Dias trabalhados mês a mês (<span id="dt13-ano-tabela"></span>)</span>
+            <div style="display:flex;gap:6px">
+              <button class="icon-btn" style="font-size:12px;padding:5px 10px" onclick="dt13MarcarTodos(true)"><i class="fas fa-check-double"></i> Todos "Sim"</button>
+              <button class="icon-btn" style="font-size:12px;padding:5px 10px" onclick="dt13MarcarTodos(false)"><i class="fas fa-rotate-left"></i> Limpar</button>
+            </div>
           </div>
           <div class="dt13-table-wrap">
             <table class="dt13-table">
               <thead>
                 <tr>
-                  <th>Mês</th><th class="num">Dias c/ registro</th><th class="num">HE 75%</th>
-                  <th class="num">HE 100%</th><th class="num">Noturno</th><th>Trabalhou todos os dias?</th><th>Conta avo?</th>
+                  <th>Mês</th><th>Escala</th><th class="num">Dias c/ registro</th><th class="num">Dias úteis</th>
+                  <th>Trabalhou todos os dias?</th><th>Conta avo?</th>
                 </tr>
               </thead>
               <tbody id="dt13-mensal-body">
-                <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
+                <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
               </tbody>
             </table>
           </div>
-          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Por padrão, "Conta avo" usa os registros de ponto (≥ 15 dias com registro ou abonados no mês). Se um mês não tem registro mas você trabalhou normalmente (ex: antes de começar a usar o app), marque <strong>"Sim"</strong> em "Trabalhou todos os dias?" — o app passa a considerar todos os dias úteis daquele mês. A regra legal exata também considera a data de admissão/demissão, que o app ainda não registra.</small>
+          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Por padrão, "Conta avo" usa os registros de ponto (≥ 15 dias com registro ou abonados no mês). Se um mês não tem registro mas você trabalhou normalmente (ex: antes de começar a usar o app, ou um mês futuro na simulação), marque <strong>"Sim"</strong> — o app passa a considerar todos os dias úteis daquele mês. <strong>Dias úteis</strong> seguem a escala do mês: na <strong>6x1 o sábado conta</strong> como dia útil (seg–sáb); na <strong>5x2</strong> só seg–sex. Domingos e feriados que você marcou no Histórico não contam. A regra legal exata também considera a data de admissão/demissão, que o app ainda não registra.</small>
+        </div>
+
+        <!-- Horas extras mês a mês -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <span class="card-title"><i class="fas fa-stopwatch" style="color:var(--warning)"></i> Horas extras e noturno mês a mês (média do 13º)</span>
+            <button class="icon-btn" style="font-size:12px;padding:5px 10px" onclick="dt13HETodosPonto()"><i class="fas fa-rotate-left"></i> Tudo do ponto</button>
+          </div>
+          <div class="dt13-table-wrap">
+            <table class="dt13-table">
+              <thead>
+                <tr>
+                  <th>Mês</th><th>Escala</th><th>Origem</th><th class="num">HE 75%</th><th class="num">HE 100%</th>
+                  <th class="num">Noturno</th><th class="num">Valor-hora</th><th class="num">Valor no mês</th>
+                </tr>
+              </thead>
+              <tbody id="dt13-he-body">
+                <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" style="font-weight:700;color:var(--text)">Total do ano</td>
+                  <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-tot50">0h 00m</td>
+                  <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-tot100">0h 00m</td>
+                  <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-totnot">0h 00m</td>
+                  <td></td>
+                  <td class="num" style="font-weight:700;color:var(--success)" id="dt13-he-totvalor">R$ 0,00</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Em <strong>"Do ponto"</strong>, as horas vêm dos seus registros (HE pela jornada diária configurada em Configurações; domingo = HE 100%). Troque para <strong>"Manual"</strong> para digitar você mesmo as horas daquele mês — aceita <code>40:30</code>, <code>40h30</code>, <code>40,5</code> ou <code>40</code>. Útil para meses sem registro, meses futuros na simulação ou para conferir com o que veio no holerite. Cada mês é valorizado com o valor-hora da escala daquele mês (salário ÷ divisor). Seus ajustes manuais ficam salvos neste navegador.</small>
         </div>
 
         <!-- Descontos -->
@@ -3249,8 +3335,9 @@ function render13Ferias() {
 // ═══════════════════════════════════════════════════════════
 let dt13MesesDetalhe = [];
 
-// Para cada mês do ano: dias com registro de ponto, HE 75%/100% e noturno daquele mês,
-// e se o mês conta como avo (estimativa: ≥15 dias com ponto ou abonado)
+// Para cada mês do ano: dias com registro de ponto, HE 75%/100% e noturno vindos do ponto,
+// e se o mês conta como avo (estimativa: ≥15 dias com ponto ou abonado).
+// A valorização em R$ é feita depois, com o valor-hora da escala de cada mês.
 async function calcDetalhamentoMensalAno(ano) {
   const nomesMeses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
   const { data: registros } = await db.from('registros_ponto').select('*')
@@ -3259,13 +3346,6 @@ async function calcDetalhamentoMensalAno(ano) {
     .order('timestamp');
   const porDia = {};
   (registros || []).forEach(r => { (porDia[r.data] = porDia[r.data] || []); porDia[r.data].push(r); });
-
-  const chMensal = perfil.carga_horaria_mensal || 220;
-  const valorHora = chMensal > 0 ? (perfil.salario_base || 0) / chMensal : 0;
-  const pHE50 = (perfil.percentual_he_50 || 75) / 100;
-  const pHE100 = (perfil.percentual_he_100 || 100) / 100;
-  const adicCfg = getAdicNoturnoCfg();
-  const pNoturno = adicCfg.ativo ? (adicCfg.pct || 0) / 100 : 0;
 
   const meses = [];
   for (let mi = 1; mi <= 12; mi++) {
@@ -3286,39 +3366,177 @@ async function calcDetalhamentoMensalAno(ano) {
         diasConsiderados++;
       }
     }
-    const valorVariavel = he50h * valorHora * (1 + pHE50) + he100h * valorHora * (1 + pHE100) + noturnasH * valorHora * pNoturno;
-    meses.push({ mes: mi, nome: nomesMeses[mi - 1], diasConsiderados, he50h, he100h, noturnasH, valorVariavel, contaAvo: diasConsiderados >= 15 });
+    meses.push({ mes: mi, nome: nomesMeses[mi - 1], diasConsiderados, he50h, he100h, noturnasH, contaAvo: diasConsiderados >= 15 });
   }
   return meses;
 }
 
 let dt13Ano = new Date().getFullYear();
-let dt13Overrides = {}; // { [mes]: true|false } — "Trabalhou todos os dias?" definido manualmente por mês
+let dt13Overrides = {};   // { [mes]: true } — "Trabalhou todos os dias?" = Sim
+let dt13HEOverrides = {}; // { [mes]: { he50h, he100h, noturnasH } } — horas preenchidas manualmente
 
-// Dias efetivos e status de avo de um mês, já considerando a resposta manual "Trabalhou todos os dias?"
-function dt13Efetivo(m) {
-  if (dt13Overrides[m.mes] === true) {
-    const diasUteis = getDiasUteisNoMes(dt13Ano, m.mes);
-    return { dias: diasUteis, contaAvo: true, manual: true };
-  }
-  return { dias: m.diasConsiderados, contaAvo: m.contaAvo, manual: false };
+// ── Escala de trabalho / EC 141/2026 (fim da 6x1) ──
+const DT13_REGIMES = {
+  '6x1-44': { label: '6x1 · 44h', nome: '6x1 — 44h', semanal: 44, diasSemana: 6 },
+  '5x2-42': { label: '5x2 · 42h', nome: '5x2 — 42h (transição)', semanal: 42, diasSemana: 5 },
+  '5x2-40': { label: '5x2 · 40h', nome: '5x2 — 40h (definitiva)', semanal: 40, diasSemana: 5 },
+};
+
+// 1ª etapa (42h + 2 folgas): 60 dias após a promulgação · 2ª etapa (40h): 12 meses após a 1ª
+function dt13Fases() {
+  const v = document.getElementById('dt13-promulgacao').value || '2026-10-16';
+  const [y, m, d] = v.split('-').map(Number);
+  const fase1 = new Date(y, m - 1, d + 60);
+  return { prom: new Date(y, m - 1, d), fase1, fase2: new Date(fase1.getFullYear() + 1, fase1.getMonth(), fase1.getDate()) };
 }
 
-function toggleDt13Dia(mes, valor) {
-  if (valor === 'sim') dt13Overrides[mes] = true;
-  else if (valor === 'nao') delete dt13Overrides[mes]; // volta a usar os registros reais
-  renderDt13Mensal();
-  calcDecimoTerceiroBeta();
+// Escala fixa escolhida, ou (modo automático) a que vigora na maior parte dos dias do mês
+function dt13RegimeMes(mes) {
+  const escala = document.getElementById('dt13-escala').value || 'auto';
+  if (escala !== 'auto') return escala;
+  const { fase1, fase2 } = dt13Fases();
+  const cont = { '6x1-44': 0, '5x2-42': 0, '5x2-40': 0 };
+  const ult = new Date(dt13Ano, mes, 0).getDate();
+  for (let d = 1; d <= ult; d++) {
+    const dt = new Date(dt13Ano, mes - 1, d);
+    cont[dt >= fase2 ? '5x2-40' : dt >= fase1 ? '5x2-42' : '6x1-44']++;
+  }
+  return Object.keys(cont).reduce((a, b) => cont[b] > cont[a] ? b : a);
+}
+
+// Divisor mensal = horas semanais × 5 (44h→220, 42h→210, 40h→200), sem passar do contrato configurado
+function dt13Divisor(regime) {
+  return Math.min(perfil.carga_horaria_mensal || 220, DT13_REGIMES[regime].semanal * 5);
+}
+
+// Dias úteis do mês na escala: 6x1 = seg–sáb (sábado conta), 5x2 = seg–sex; domingos e feriados marcados ficam de fora
+function dt13DiasUteis(mes, regime) {
+  const abon = getDiasAbonados(dt13Ano, mes);
+  const ult = new Date(dt13Ano, mes, 0).getDate();
+  let n = 0;
+  for (let d = 1; d <= ult; d++) {
+    const dow = new Date(dt13Ano, mes - 1, d).getDay();
+    if (dow === 0 || (dow === 6 && DT13_REGIMES[regime].diasSemana === 5)) continue;
+    const ds = `${dt13Ano}-${String(mes).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    if (abon[ds] && abon[ds].tipo === 'feriado') continue;
+    n++;
+  }
+  return n;
+}
+
+// Dias/avo do mês já considerando a resposta manual "Trabalhou todos os dias?"
+function dt13Efetivo(m) {
+  const regime = dt13RegimeMes(m.mes);
+  if (dt13Overrides[m.mes]) return { regime, dias: dt13DiasUteis(m.mes, regime), contaAvo: true, manual: true };
+  return { regime, dias: m.diasConsiderados, contaAvo: m.contaAvo, manual: false };
+}
+
+// Horas extras/noturno do mês: do ponto ou preenchidas manualmente
+function dt13HEEfetivo(m) {
+  const o = dt13HEOverrides[m.mes];
+  return o ? { he50h: o.he50h, he100h: o.he100h, noturnasH: o.noturnasH, manual: true }
+           : { he50h: m.he50h, he100h: m.he100h, noturnasH: m.noturnasH, manual: false };
+}
+
+function dt13SalBase() {
+  const v = document.getElementById('dt13-salario-override').value;
+  return v ? +v : (perfil.salario_base || 0);
+}
+
+// Valor das HE/noturno de um mês com o valor-hora da escala do mês (ou de uma escala forçada, p/ comparar)
+function dt13ValorMes(m, salBase, regimeForcado) {
+  const regime = regimeForcado || dt13RegimeMes(m.mes);
+  const div = dt13Divisor(regime);
+  const vh = div > 0 ? salBase / div : 0;
+  const he = dt13HEEfetivo(m);
+  const pHE50 = (perfil.percentual_he_50 || 75) / 100;
+  const pHE100 = (perfil.percentual_he_100 || 100) / 100;
+  const adicCfg = getAdicNoturnoCfg();
+  const pNoturno = adicCfg.ativo ? (adicCfg.pct || 0) / 100 : 0;
+  const valor = he.he50h * vh * (1 + pHE50) + he.he100h * vh * (1 + pHE100) + he.noturnasH * vh * pNoturno;
+  return { regime, div, vh, he, valor };
+}
+
+// Horas digitadas: aceita "40:30", "40h30", "40h30m", "40h", "45m", "40,5", "40.5", "40"
+function parseHorasInput(str) {
+  const s = String(str ?? '').trim().toLowerCase().replace(/\s+/g, '');
+  if (!s) return 0;
+  let mt = s.match(/^(\d+)(?:h|:)(\d{1,2})?(?:m|min)?$/);
+  if (mt) return (mt[2] && +mt[2] >= 60) ? NaN : +mt[1] + (mt[2] ? +mt[2] / 60 : 0);
+  mt = s.match(/^(\d+)(?:m|min)$/);
+  if (mt) return +mt[1] / 60;
+  if (!/^\d+([.,]\d+)?$/.test(s)) return NaN;
+  return parseFloat(s.replace(',', '.'));
+}
+
+function fmtHHMM(h) {
+  let hh = Math.floor(h || 0), mm = Math.round(((h || 0) - hh) * 60);
+  if (mm === 60) { hh++; mm = 0; }
+  return `${hh}:${String(mm).padStart(2, '0')}`;
+}
+
+// Ajustes manuais e escolhas desta página ficam salvos no navegador (por usuário e por ano)
+function dt13StoreKey() { return 'clockin_dt13_' + activeId(); }
+function dt13LoadStore() {
+  try { return JSON.parse(localStorage.getItem(dt13StoreKey())) || {}; } catch { return {}; }
+}
+function dt13SaveStore() {
+  try {
+    const st = dt13LoadStore();
+    st.escala = document.getElementById('dt13-escala').value;
+    st.promulgacao = document.getElementById('dt13-promulgacao').value;
+    st.anos = st.anos || {};
+    st.anos[dt13Ano] = { dias: dt13Overrides, he: dt13HEOverrides };
+    localStorage.setItem(dt13StoreKey(), JSON.stringify(st));
+  } catch {}
 }
 
 async function renderDecimoTerceiroBeta() {
   if (!isBeta13) return;
-  dt13Ano = new Date().getFullYear();
+  const atual = new Date().getFullYear();
+  const anoSel = document.getElementById('dt13-ano');
+  if (!anoSel.dataset.ready) {
+    anoSel.innerHTML = [atual, atual + 1].map(a => `<option value="${a}">${a}${a === atual ? ' (ano atual)' : ' (simulação)'}</option>`).join('');
+    const st = dt13LoadStore();
+    if (st.escala) document.getElementById('dt13-escala').value = st.escala;
+    if (st.promulgacao) document.getElementById('dt13-promulgacao').value = st.promulgacao;
+    anoSel.dataset.ready = '1';
+  }
+  await loadDt13Ano(+anoSel.value || atual);
+}
+
+async function loadDt13Ano(ano) {
+  dt13Ano = ano;
+  const salvo = (dt13LoadStore().anos || {})[ano] || {};
+  dt13Overrides = salvo.dias || {};
+  dt13HEOverrides = salvo.he || {};
+  document.getElementById('dt13-ano-tabela').textContent = ano;
+  const carregando = n => `<tr><td colspan="${n}" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>`;
+  document.getElementById('dt13-mensal-body').innerHTML = carregando(6);
+  document.getElementById('dt13-he-body').innerHTML = carregando(8);
+  dt13MesesDetalhe = await calcDetalhamentoMensalAno(ano);
+  dt13Refresh();
+}
+
+function dt13Refresh() {
+  if (!isBeta13 || !dt13MesesDetalhe.length) return;
+  renderDt13Mensal();
+  renderDt13HE();
+  calcDecimoTerceiroBeta();
+}
+
+function toggleDt13Dia(mes, valor) {
+  if (valor === 'sim') dt13Overrides[mes] = true;
+  else delete dt13Overrides[mes]; // volta a usar os registros reais
+  dt13SaveStore();
+  renderDt13Mensal();
+  calcDecimoTerceiroBeta();
+}
+
+function dt13MarcarTodos(sim) {
   dt13Overrides = {};
-  document.getElementById('dt13-ano').value = dt13Ano;
-  document.getElementById('dt13-ano-tabela').textContent = dt13Ano;
-  document.getElementById('dt13-mensal-body').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>';
-  dt13MesesDetalhe = await calcDetalhamentoMensalAno(dt13Ano);
+  if (sim) for (let mi = 1; mi <= 12; mi++) dt13Overrides[mi] = true;
+  dt13SaveStore();
   renderDt13Mensal();
   calcDecimoTerceiroBeta();
 }
@@ -3332,10 +3550,9 @@ function renderDt13Mensal() {
     return `
     <tr class="${ef.contaAvo ? 'avo-sim' : ''}">
       <td>${m.nome}</td>
+      <td><span class="dt13-regime-badge r-${ef.regime}">${DT13_REGIMES[ef.regime].label}</span></td>
       <td class="num">${m.diasConsiderados}</td>
-      <td class="num">${formatHoras(m.he50h)}</td>
-      <td class="num">${formatHoras(m.he100h)}</td>
-      <td class="num">${formatHoras(m.noturnasH)}</td>
+      <td class="num">${dt13DiasUteis(m.mes, ef.regime)}</td>
       <td>
         <select class="dt13-dia-select" onchange="toggleDt13Dia(${m.mes}, this.value)">
           <option value="nao" ${!dt13Overrides[m.mes] ? 'selected' : ''}>Não</option>
@@ -3347,22 +3564,124 @@ function renderDt13Mensal() {
   }).join('');
 }
 
+function toggleDt13HEManual(mes, valor) {
+  if (valor === 'manual') {
+    const m = dt13MesesDetalhe.find(x => x.mes === mes);
+    dt13HEOverrides[mes] = { he50h: m.he50h, he100h: m.he100h, noturnasH: m.noturnasH }; // começa pelo que veio do ponto
+  } else {
+    delete dt13HEOverrides[mes];
+  }
+  dt13SaveStore();
+  renderDt13HE();
+  calcDecimoTerceiroBeta();
+}
+
+// Atualiza só a célula de valor da linha (sem redesenhar a tabela) para não perder o foco ao usar Tab
+function setDt13HE(mes, campo, el) {
+  const o = dt13HEOverrides[mes];
+  if (!o) return;
+  const h = parseHorasInput(el.value);
+  if (isNaN(h) || h < 0) {
+    toast('Hora inválida. Use 40:30, 40h30 ou 40,5', 'error');
+    el.value = fmtHHMM(o[campo]);
+    return;
+  }
+  o[campo] = h;
+  el.value = fmtHHMM(h);
+  dt13SaveStore();
+  const m = dt13MesesDetalhe.find(x => x.mes === mes);
+  document.getElementById('dt13-he-valor-' + mes).textContent = fmtBRL(dt13ValorMes(m, dt13SalBase()).valor);
+  calcDecimoTerceiroBeta();
+}
+
+function dt13HETodosPonto() {
+  dt13HEOverrides = {};
+  dt13SaveStore();
+  renderDt13HE();
+  calcDecimoTerceiroBeta();
+}
+
+function renderDt13HE() {
+  const salBase = dt13SalBase();
+  document.getElementById('dt13-he-body').innerHTML = dt13MesesDetalhe.map(m => {
+    const v = dt13ValorMes(m, salBase);
+    const manual = v.he.manual;
+    const cel = campo => manual
+      ? `<input type="text" class="dt13-hora-input" value="${fmtHHMM(v.he[campo])}" placeholder="0:00" onchange="setDt13HE(${m.mes}, '${campo}', this)">`
+      : formatHoras(v.he[campo]);
+    return `
+    <tr class="${manual ? 'avo-sim' : ''}">
+      <td>${m.nome}</td>
+      <td><span class="dt13-regime-badge r-${v.regime}">${DT13_REGIMES[v.regime].label}</span></td>
+      <td>
+        <select class="dt13-dia-select" onchange="toggleDt13HEManual(${m.mes}, this.value)">
+          <option value="ponto" ${!manual ? 'selected' : ''}>Do ponto</option>
+          <option value="manual" ${manual ? 'selected' : ''}>Manual</option>
+        </select>
+      </td>
+      <td class="num">${cel('he50h')}</td>
+      <td class="num">${cel('he100h')}</td>
+      <td class="num">${cel('noturnasH')}</td>
+      <td class="num">${fmtBRL(v.vh)} <span style="color:var(--text-dim)">÷${v.div}</span></td>
+      <td class="num" id="dt13-he-valor-${m.mes}">${fmtBRL(v.valor)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Datas das etapas da EC e comparação do 13º com as mesmas HE em cada escala
+function dt13RenderEscalaInfo(salBase, decimoTerceiroBase) {
+  const { prom, fase1, fase2 } = dt13Fases();
+  const fd = d => d.toLocaleDateString('pt-BR');
+  const escala = document.getElementById('dt13-escala').value || 'auto';
+  const regimesNoAno = [...new Set(dt13MesesDetalhe.map(m => dt13RegimeMes(m.mes)))];
+  document.getElementById('dt13-fases-info').innerHTML =
+    `<i class="fas fa-calendar-day"></i> Promulgação: <strong>${fd(prom)}</strong> · 1ª etapa (42h + 2 folgas): <strong>${fd(fase1)}</strong> · 2ª etapa (40h): <strong>${fd(fase2)}</strong>. ` +
+    (escala === 'auto'
+      ? `Em ${dt13Ano}, o cálculo usa: ${regimesNoAno.map(r => DT13_REGIMES[r].nome).join(' → ')} (cada mês na escala que vigora na maior parte dos dias).`
+      : `Escala fixa escolhida para o ano inteiro.`) +
+    ` <span style="color:var(--text-dim)">Confira a data oficial de publicação no Diário Oficial; se for diferente, ajuste a data acima.</span>`;
+
+  const comp = Object.keys(DT13_REGIMES).map(r => {
+    const div = dt13Divisor(r);
+    const variavel = dt13MesesDetalhe.reduce((s, m) => s + dt13ValorMes(m, salBase, r).valor, 0) / 12;
+    return { r, div, vh: div > 0 ? salBase / div : 0, total: decimoTerceiroBase + variavel };
+  });
+  const ref = comp[0];
+  document.getElementById('dt13-comp-regimes').innerHTML = comp.map(c => {
+    const pct = ref.vh > 0 ? (c.vh / ref.vh - 1) * 100 : 0;
+    return `
+    <div class="dt13-comp-card${escala === c.r ? ' ativo' : ''}">
+      <div class="c-tit">${DT13_REGIMES[c.r].nome}</div>
+      <div class="c-val">${fmtBRL(c.total)}</div>
+      <div class="c-sub">13º bruto estimado<br>Valor-hora ${fmtBRL(c.vh)} (÷${c.div})${pct > 0.05 ? ` · <span style="color:var(--success)">+${pct.toFixed(1).replace('.', ',')}%</span>` : ''}</div>
+    </div>`;
+  }).join('');
+}
+
 function calcDecimoTerceiroBeta() {
   if (!isBeta13) return;
   const ano = dt13Ano;
-  const salOverride = document.getElementById('dt13-salario-override').value;
-  const salBase = salOverride ? +salOverride : (perfil.salario_base || 0);
+  const salBase = dt13SalBase();
 
-  const valorVariavelAno = dt13MesesDetalhe.reduce((s, m) => s + m.valorVariavel, 0);
-  const he50hAno = dt13MesesDetalhe.reduce((s, m) => s + m.he50h, 0);
-  const he100hAno = dt13MesesDetalhe.reduce((s, m) => s + m.he100h, 0);
-  const noturnasHAno = dt13MesesDetalhe.reduce((s, m) => s + m.noturnasH, 0);
+  const valores = dt13MesesDetalhe.map(m => dt13ValorMes(m, salBase));
+  const valorVariavelAno = valores.reduce((s, v) => s + v.valor, 0);
+  const he50hAno = valores.reduce((s, v) => s + v.he.he50h, 0);
+  const he100hAno = valores.reduce((s, v) => s + v.he.he100h, 0);
+  const noturnasHAno = valores.reduce((s, v) => s + v.he.noturnasH, 0);
+  const nManualHE = valores.filter(v => v.he.manual).length;
+  const divisoresUsados = [...new Map(valores.map(v => [v.regime, v.div])).entries()]
+    .map(([r, d]) => `${DT13_REGIMES[r].label} ÷${d}`).join(', ');
   const meses = dt13MesesDetalhe.reduce((s, m) => s + (dt13Efetivo(m).contaAvo ? 1 : 0), 0);
   document.getElementById('dt13-meses-computados').textContent = `${meses} de 12`;
+  document.getElementById('dt13-he-tot50').textContent = formatHoras(he50hAno);
+  document.getElementById('dt13-he-tot100').textContent = formatHoras(he100hAno);
+  document.getElementById('dt13-he-totnot').textContent = formatHoras(noturnasHAno);
+  document.getElementById('dt13-he-totvalor').textContent = fmtBRL(valorVariavelAno);
 
   const decimoTerceiroBase = salBase / 12 * meses;
   const decimoTerceiroVariavel = valorVariavelAno / 12;
   const decimoTerceiro = decimoTerceiroBase + decimoTerceiroVariavel;
+  dt13RenderEscalaInfo(salBase, decimoTerceiroBase);
 
   const inssInfo = calcINSSDetalhado(decimoTerceiro);
   const irrfInfo = calcIRRFDetalhado(decimoTerceiro - inssInfo.total);
@@ -3389,9 +3708,9 @@ function calcDecimoTerceiroBeta() {
   // Memória de cálculo — passo a passo explicativo
   const passos = [
     { t: `Salário base ÷ 12 × meses computados`, f: `${fmtBRL(salBase)} ÷ 12 × ${meses} = ${fmtBRL(decimoTerceiroBase)}`,
-      d: `Essa é a parte "fixa" do seu 13º: cada mês computado (≥15 dias trabalhados/abonados, ou marcado manualmente como "Sim" na tabela abaixo) dá direito a 1/12 do salário contratual.` },
+      d: `Essa é a parte "fixa" do seu 13º: cada mês computado (≥15 dias trabalhados/abonados, ou marcado manualmente como "Sim" na tabela de dias) dá direito a 1/12 do salário contratual. A troca de escala não muda essa parte — a emenda proíbe reduzir o salário.` },
     { t: `Média de horas extras + adicional noturno do ano ÷ 12`, f: `${fmtBRL(valorVariavelAno)} (total do ano) ÷ 12 = ${fmtBRL(decimoTerceiroVariavel)}`,
-      d: `A lei manda incluir a média das verbas variáveis habituais no 13º. Somamos tudo que foi pago de HE 75%/100% e adicional noturno nos 12 meses (${formatHoras(he50hAno)} em HE 75%, ${formatHoras(he100hAno)} em HE 100%, ${formatHoras(noturnasHAno)} de noturno) e dividimos por 12.` },
+      d: `A lei manda incluir a média das verbas variáveis habituais no 13º. Somamos HE 75%/100% e adicional noturno dos 12 meses (${formatHoras(he50hAno)} em HE 75%, ${formatHoras(he100hAno)} em HE 100%, ${formatHoras(noturnasHAno)} de noturno) e dividimos por 12. Cada mês é valorizado com o valor-hora da escala daquele mês (salário ÷ divisor: ${divisoresUsados || '—'}) — com o fim da 6x1 o divisor cai e a mesma hora extra passa a valer mais.${nManualHE ? ` ${nManualHE} ${nManualHE === 1 ? 'mês com horas preenchidas' : 'meses com horas preenchidas'} manualmente.` : ''}` },
     { t: `13º bruto = base + variáveis`, f: `${fmtBRL(decimoTerceiroBase)} + ${fmtBRL(decimoTerceiroVariavel)} = ${fmtBRL(decimoTerceiro)}`,
       d: `Esse é o valor total do seu 13º salário antes de qualquer desconto.` },
     { t: `INSS sobre o 13º`, f: inssAtivo ? `tabela progressiva 2024 aplicada sobre ${fmtBRL(decimoTerceiro)} = ${fmtBRL(inssValor)}` : `desativado em Configurações`,

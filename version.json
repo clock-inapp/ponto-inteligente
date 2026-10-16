@@ -1,4 +1,4 @@
 {
-  "version": "1.17",
-  "notes": "Correção legal no 13º Beta: remove VT, VR e empréstimo consignado dos descontos (vedados por lei/eSocial sobre o 13º) e adiciona pensão alimentícia como desconto opcional"
+  "version": "1.18",
+  "notes": "13º Beta: simulação do fim da 6x1 (EC 141/2026) com sábados como dia útil na 6x1, escala 5x2 42h/40h e valor-hora maior; horas extras podem ser preenchidas manualmente mês a mês; corrige rolagem lateral no celular"
 }
