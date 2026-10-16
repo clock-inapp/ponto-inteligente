@@ -1,4 +1,4 @@
 {
-  "version": "1.19",
-  "notes": "13º Beta segue a regra de meses: jan–dez com mês atual e futuros projetados, média jan–nov ÷ 11 na 2ª parcela e revisão de janeiro com dezembro; prazos antecipados quando caem em fim de semana (2ª parcela 2026: 18/12)"
+  "version": "1.20",
+  "notes": "Revisão legal completa: tabelas INSS/IRRF 2026 (com redutor da Lei 15.270), feriados nacionais, HE 100% em domingo/feriado, hora noturna reduzida, VT sobre o salário base, DSR no 13º e férias; Simulação projeta o 13º em 12 meses; resumo do 13º na aba Ajuda"
 }
