@@ -1303,23 +1303,27 @@
             <span class="card-title"><i class="fas fa-minus-circle" style="color:var(--danger)"></i> Descontos sobre o 13º (2ª parcela)</span>
           </div>
           <div style="font-size:12px;color:var(--text-muted);padding:0 2px 12px;line-height:1.6">
-            Além de INSS e IRRF, o 13º pode ter os mesmos descontos configurados em <strong style="color:var(--text)">Configurações</strong>. Por padrão deixamos ligados só o <strong style="color:var(--text)">Plano de Saúde</strong> e os <strong style="color:var(--text)">Descontos extras</strong> (ex: empréstimos consignados) — são valores fixos que a maioria das empresas desconta em qualquer mês, inclusive no 13º. <strong style="color:var(--text)">Vale Transporte/Refeição</strong> ficam desligados por padrão porque, na maioria dos casos, não incidem sobre o 13º (não há dias de deslocamento/refeição a cobrir, já que o 13º não corresponde a dias trabalhados) — mas você pode ligar se a sua empresa desconta mesmo assim.
+            O 13º é uma gratificação natalina com regras de desconto bem mais restritas que o salário mensal, pela CLT e pelo eSocial. A lista abaixo mostra o que pode e o que <strong style="color:var(--danger)">não pode</strong> ser descontado.
+          </div>
+          <div style="background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);border-radius:9px;padding:12px 14px;margin-bottom:10px">
+            <div style="font-size:11px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px"><i class="fas fa-check-circle"></i> Pode ser descontado</div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.6">INSS, IRRF (acima da faixa de isenção), <strong style="color:var(--text)">pensão alimentícia</strong> (só com determinação judicial expressa) e o valor já adiantado na 1ª parcela.</div>
+          </div>
+          <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:9px;padding:12px 14px;margin-bottom:14px">
+            <div style="font-size:11px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px"><i class="fas fa-times-circle"></i> NÃO pode ser descontado</div>
+            <div style="font-size:12px;color:var(--text-muted);line-height:1.6"><strong style="color:var(--text)">Vale Transporte e Vale Refeição/Alimentação</strong> — esses benefícios cobrem dias de deslocamento/refeição do mês corrente; o 13º não corresponde a dias trabalhados, então nenhum vale novo é concedido e nada é descontado. <strong style="color:var(--text)">Empréstimo consignado</strong> — por regra do Ministério do Trabalho, parcelas de consignado só podem ser cobradas nas 12 folhas mensais regulares; o próprio eSocial bloqueia esse lançamento na folha do 13º. Se aparecer algum desses descontos na sua folha, é motivo pra procurar o RH e pedir a correção/devolução.</div>
           </div>
           <div class="toggle-row">
-            <div class="info"><span>Plano de Saúde</span><small id="dt13-desc-saude-info"></small></div>
-            <label class="toggle"><input type="checkbox" id="dt13-desc-saude" checked onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="info"><span>Descontos extras (empréstimos, etc.)</span><small id="dt13-desc-extras-info"></small></div>
-            <label class="toggle"><input type="checkbox" id="dt13-desc-extras" checked onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
-          </div>
-          <div class="toggle-row">
-            <div class="info"><span>Vale Transporte</span><small>Incomum sobre o 13º</small></div>
-            <label class="toggle"><input type="checkbox" id="dt13-desc-vt" onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
+            <div class="info"><span>Pensão Alimentícia</span><small>Só com determinação judicial expressa</small></div>
+            <div style="display:flex;align-items:center;gap:4px;margin:0 10px">
+              <input type="number" class="form-control" id="dt13-pensao-pct" style="width:70px;margin:0" placeholder="0" min="0" max="100" step="0.1" oninput="calcDecimoTerceiroBeta()">
+              <span style="color:var(--text-muted);font-size:14px;font-weight:600">%</span>
+            </div>
+            <label class="toggle"><input type="checkbox" id="dt13-desc-pensao" onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
           </div>
           <div class="toggle-row" style="border-bottom:none">
-            <div class="info"><span>Vale Refeição</span><small>Incomum sobre o 13º</small></div>
-            <label class="toggle"><input type="checkbox" id="dt13-desc-vr" onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
+            <div class="info"><span>Plano de Saúde</span><small id="dt13-desc-saude-info">Regra geral: NÃO descontado. Exceção rara: previsão em convenção coletiva ou autorização sua expressa</small></div>
+            <label class="toggle"><input type="checkbox" id="dt13-desc-saude" onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
           </div>
 
           <div class="grid-2 mt-4" style="gap:20px">
@@ -3367,25 +3371,16 @@ function calcDecimoTerceiroBeta() {
   const inssValor = inssAtivo ? inssInfo.total : 0;
   const irrfValor = irrfAtivo ? irrfInfo.valor : 0;
 
-  // Outros descontos configurados (opcionais, escolhidos pelo usuário nesta página)
-  const incluirSaude = document.getElementById('dt13-desc-saude').checked;
-  const incluirExtras = document.getElementById('dt13-desc-extras').checked;
-  const incluirVT = document.getElementById('dt13-desc-vt').checked;
-  const incluirVR = document.getElementById('dt13-desc-vr').checked;
+  // Outros descontos — SOMENTE os que a lei realmente permite incidir sobre o 13º.
+  // VT, VR e empréstimo consignado NÃO entram aqui: são vedados por lei/eSocial sobre o 13º.
+  const incluirPensao = document.getElementById('dt13-desc-pensao').checked;
+  const pensaoPct = +document.getElementById('dt13-pensao-pct').value || 0;
+  const pensao13 = incluirPensao ? decimoTerceiro * (pensaoPct / 100) : 0;
 
+  const incluirSaude = document.getElementById('dt13-desc-saude').checked; // exceção rara — desligado por padrão
   const planoSaude13 = (incluirSaude && configDescontos.plano_saude_ativo) ? (configDescontos.plano_saude_valor || 0) : 0;
-  const vt13 = (incluirVT && configDescontos.vt_ativo) ? decimoTerceiro * ((configDescontos.vt_valor || 0) / 100) : 0;
-  const vr13 = (incluirVR && configDescontos.vr_ativo) ? (configDescontos.vr_valor || 0) : 0;
-  let extras13 = 0;
-  const extrasDetalhe13 = incluirExtras ? descontosExtras.filter(d => d.ativo).map(d => {
-    const v = d.tipo === 'percentual' ? decimoTerceiro * (d.valor / 100) : d.valor;
-    extras13 += v;
-    return { nome: d.nome, valor: v };
-  }) : [];
-  const outrosTotal = planoSaude13 + vt13 + vr13 + extras13;
 
-  document.getElementById('dt13-desc-saude-info').textContent = configDescontos.plano_saude_ativo && configDescontos.plano_saude_valor ? fmtBRL(configDescontos.plano_saude_valor) + '/mês' : 'não configurado';
-  document.getElementById('dt13-desc-extras-info').textContent = descontosExtras.filter(d => d.ativo).length ? descontosExtras.filter(d => d.ativo).length + ' ativo(s)' : 'nenhum configurado';
+  const outrosTotal = pensao13 + planoSaude13;
 
   const parcela1 = decimoTerceiro / 2;
   const parcela2 = Math.max(0, decimoTerceiro / 2 - inssValor - irrfValor - outrosTotal);
@@ -3403,12 +3398,12 @@ function calcDecimoTerceiroBeta() {
       d: `O INSS do 13º é calculado separadamente do salário mensal, usando a mesma tabela progressiva — veja o detalhamento por faixa mais abaixo.` },
     { t: `IRRF sobre o 13º`, f: irrfAtivo ? `tabela progressiva 2024 aplicada sobre (${fmtBRL(decimoTerceiro)} − ${fmtBRL(inssValor)}) = ${fmtBRL(irrfValor)}` : `desativado em Configurações`,
       d: `O IRRF também incide separadamente sobre o 13º, depois de descontar o INSS do próprio 13º.` },
-    { t: `Outros descontos configurados (opcional)`, f: outrosTotal > 0 ? `${fmtBRL(planoSaude13)} (plano) + ${fmtBRL(vt13)} (VT) + ${fmtBRL(vr13)} (VR) + ${fmtBRL(extras13)} (extras) = ${fmtBRL(outrosTotal)}` : 'nenhum ativado',
-      d: `Além de INSS/IRRF, você pode incluir aqui os mesmos descontos fixos configurados em Configurações (plano de saúde, VT, VR, empréstimos/extras). Ajuste os interruptores no card "Descontos sobre o 13º" acima.` },
+    { t: `Pensão alimentícia / plano de saúde (se aplicável)`, f: outrosTotal > 0 ? `${fmtBRL(pensao13)} (pensão) + ${fmtBRL(planoSaude13)} (plano de saúde) = ${fmtBRL(outrosTotal)}` : 'nenhum ativado',
+      d: `Diferente do salário mensal, o 13º tem descontos bem restritos por lei. Vale-transporte, vale-refeição/alimentação e parcelas de empréstimo consignado NÃO podem ser descontados do 13º (o próprio eSocial bloqueia esse lançamento) — por isso nem aparecem como opção aqui. Só incluímos pensão alimentícia (com determinação judicial) e plano de saúde (exceção rara, só com previsão em convenção coletiva ou autorização sua expressa).` },
     { t: `1ª parcela (sem descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 = ${fmtBRL(parcela1)}`,
       d: `Metade do 13º bruto, paga como adiantamento — sem nenhum desconto.` },
     { t: `2ª parcela (com descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 − ${fmtBRL(inssValor)} − ${fmtBRL(irrfValor)} − ${fmtBRL(outrosTotal)} = ${fmtBRL(parcela2)}`,
-      d: `A outra metade, já com INSS, IRRF e os outros descontos ativados descontados aqui.` },
+      d: `A outra metade, já com INSS, IRRF e (se ativados) pensão alimentícia/plano de saúde descontados aqui.` },
   ];
   document.getElementById('dt13-memoria').innerHTML = passos.map((p, i) => `
     <div class="ajuda-step">
@@ -3458,10 +3453,8 @@ function calcDecimoTerceiroBeta() {
   document.getElementById('dt13-resumo-inss').textContent = '- ' + fmtBRL(inssValor);
   document.getElementById('dt13-resumo-irrf').textContent = '- ' + fmtBRL(irrfValor);
   document.getElementById('dt13-resumo-outros-lista').innerHTML = [
+    ['Pensão Alimentícia', pensao13],
     ['Plano de Saúde', planoSaude13],
-    ['Vale Transporte', vt13],
-    ['Vale Refeição', vr13],
-    ...extrasDetalhe13.map(e => [e.nome, e.valor]),
   ].filter(([, v]) => v > 0).map(([nome, v]) => `
     <div class="sim-row"><div class="label">(−) ${escapeHtml(nome)}</div><div class="value negative">- ${fmtBRL(v)}</div></div>`).join('');
   document.getElementById('dt13-liquido').textContent = fmtBRL(liquido);

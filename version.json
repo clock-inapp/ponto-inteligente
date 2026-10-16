@@ -1,4 +1,4 @@
 {
-  "version": "1.16",
-  "notes": "13º Salário (Beta): agora desconta Plano de Saúde/extras (VT/VR opcionais) e deixa corrigir mês a mês se você trabalhou todos os dias úteis mesmo sem registro de ponto"
+  "version": "1.17",
+  "notes": "Correção legal no 13º Beta: remove VT, VR e empréstimo consignado dos descontos (vedados por lei/eSocial sobre o 13º) e adiciona pensão alimentícia como desconto opcional"
 }
