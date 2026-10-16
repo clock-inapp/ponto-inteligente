@@ -1,4 +1,4 @@
 {
-  "version": "1.15",
-  "notes": "Nova área Beta: 13º Salário detalhado — explicação, memória de cálculo passo a passo, detalhamento mês a mês, parcelas e descontos (visível só para a conta em teste)"
+  "version": "1.16",
+  "notes": "13º Salário (Beta): agora desconta Plano de Saúde/extras (VT/VR opcionais) e deixa corrigir mês a mês se você trabalhou todos os dias úteis mesmo sem registro de ponto"
 }

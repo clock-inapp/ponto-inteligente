@@ -569,6 +569,9 @@
   .dt13-faixa-row:last-child { border-bottom: none; }
   .dt13-faixa-row .faixa-desc { color: var(--text-muted); }
   .dt13-faixa-row .faixa-val { font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+  .dt13-dia-select { background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+    font-size: 12px; font-family: inherit; border-radius: 6px; padding: 4px 8px; cursor: pointer; }
+  .dt13-dia-select:focus { outline: 1px solid var(--primary); }
   /* ───── BANNER DEMO ───── */
   #demo-banner { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 3000;
     background: var(--primary); color: #fff; padding: 9px 16px; border-radius: 999px; font-size: 13px; font-weight: 600;
@@ -1231,10 +1234,12 @@
               <input type="number" id="dt13-salario-override" class="form-control" placeholder="Deixe vazio p/ usar o salário salvo" oninput="calcDecimoTerceiroBeta()">
             </div>
           </div>
-          <div class="slider-group mt-4" style="margin-bottom:0">
-            <div class="slider-label">Meses trabalhados no ano <span id="dt13-meses-val">0 meses</span></div>
-            <input type="range" id="dt13-meses" min="0" max="12" value="0" oninput="this.dataset.touched='1';calcDecimoTerceiroBeta()">
-            <small style="color:var(--text-dim);font-size:11px;display:block;margin-top:6px">Cada mês com 15 dias ou mais trabalhados conta como 1 avo (1/12). Veja o detalhamento mês a mês mais abaixo.</small>
+          <div class="mt-4" style="background:var(--primary-dim);border:1px solid var(--primary);border-radius:9px;padding:12px 14px">
+            <div style="font-size:11px;color:var(--primary-light);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">
+              <i class="fas fa-calculator"></i> Meses computados para o 13º (avos)
+            </div>
+            <div style="font-size:22px;font-weight:800;color:var(--primary-light)" id="dt13-meses-computados">0 de 12</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:2px">Calculado a partir da tabela "Detalhamento mês a mês" abaixo — ajuste mês a mês lá se algum mês não tiver registro de ponto mas você tiver trabalhado normalmente.</div>
           </div>
         </div>
 
@@ -1281,15 +1286,15 @@
               <thead>
                 <tr>
                   <th>Mês</th><th class="num">Dias c/ registro</th><th class="num">HE 75%</th>
-                  <th class="num">HE 100%</th><th class="num">Noturno</th><th>Conta avo?</th>
+                  <th class="num">HE 100%</th><th class="num">Noturno</th><th>Trabalhou todos os dias?</th><th>Conta avo?</th>
                 </tr>
               </thead>
               <tbody id="dt13-mensal-body">
-                <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
+                <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
               </tbody>
             </table>
           </div>
-          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* "Conta avo" é uma estimativa (≥ 15 dias com registro ou abonados no mês). A regra legal exata também considera a data de admissão/demissão, que o app ainda não registra.</small>
+          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Por padrão, "Conta avo" usa os registros de ponto (≥ 15 dias com registro ou abonados no mês). Se um mês não tem registro mas você trabalhou normalmente (ex: antes de começar a usar o app), marque <strong>"Sim"</strong> em "Trabalhou todos os dias?" — o app passa a considerar todos os dias úteis daquele mês. A regra legal exata também considera a data de admissão/demissão, que o app ainda não registra.</small>
         </div>
 
         <!-- Descontos -->
@@ -1297,7 +1302,27 @@
           <div class="card-header">
             <span class="card-title"><i class="fas fa-minus-circle" style="color:var(--danger)"></i> Descontos sobre o 13º (2ª parcela)</span>
           </div>
-          <div class="grid-2" style="gap:20px">
+          <div style="font-size:12px;color:var(--text-muted);padding:0 2px 12px;line-height:1.6">
+            Além de INSS e IRRF, o 13º pode ter os mesmos descontos configurados em <strong style="color:var(--text)">Configurações</strong>. Por padrão deixamos ligados só o <strong style="color:var(--text)">Plano de Saúde</strong> e os <strong style="color:var(--text)">Descontos extras</strong> (ex: empréstimos consignados) — são valores fixos que a maioria das empresas desconta em qualquer mês, inclusive no 13º. <strong style="color:var(--text)">Vale Transporte/Refeição</strong> ficam desligados por padrão porque, na maioria dos casos, não incidem sobre o 13º (não há dias de deslocamento/refeição a cobrir, já que o 13º não corresponde a dias trabalhados) — mas você pode ligar se a sua empresa desconta mesmo assim.
+          </div>
+          <div class="toggle-row">
+            <div class="info"><span>Plano de Saúde</span><small id="dt13-desc-saude-info"></small></div>
+            <label class="toggle"><input type="checkbox" id="dt13-desc-saude" checked onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="info"><span>Descontos extras (empréstimos, etc.)</span><small id="dt13-desc-extras-info"></small></div>
+            <label class="toggle"><input type="checkbox" id="dt13-desc-extras" checked onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="info"><span>Vale Transporte</span><small>Incomum sobre o 13º</small></div>
+            <label class="toggle"><input type="checkbox" id="dt13-desc-vt" onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="toggle-row" style="border-bottom:none">
+            <div class="info"><span>Vale Refeição</span><small>Incomum sobre o 13º</small></div>
+            <label class="toggle"><input type="checkbox" id="dt13-desc-vr" onchange="calcDecimoTerceiroBeta()"><span class="toggle-slider"></span></label>
+          </div>
+
+          <div class="grid-2 mt-4" style="gap:20px">
             <div>
               <div class="sim-section-title"><i class="fas fa-file-invoice"></i> INSS — tabela progressiva 2024</div>
               <div id="dt13-inss-faixas"></div>
@@ -1318,6 +1343,7 @@
           <div class="sim-row"><div class="label">13º salário bruto (base + variáveis)</div><div class="value positive" id="dt13-bruto">R$ 0,00</div></div>
           <div class="sim-row"><div class="label">(−) INSS</div><div class="value negative" id="dt13-resumo-inss">R$ 0,00</div></div>
           <div class="sim-row"><div class="label">(−) IRRF</div><div class="value negative" id="dt13-resumo-irrf">R$ 0,00</div></div>
+          <div id="dt13-resumo-outros-lista"></div>
           <div class="sim-total mt-4">
             <div class="label"><i class="fas fa-hand-holding-usd"></i> 13º Líquido Estimado</div>
             <div class="value" id="dt13-liquido">R$ 0,00</div>
@@ -3262,46 +3288,73 @@ async function calcDetalhamentoMensalAno(ano) {
   return meses;
 }
 
+let dt13Ano = new Date().getFullYear();
+let dt13Overrides = {}; // { [mes]: true|false } — "Trabalhou todos os dias?" definido manualmente por mês
+
+// Dias efetivos e status de avo de um mês, já considerando a resposta manual "Trabalhou todos os dias?"
+function dt13Efetivo(m) {
+  if (dt13Overrides[m.mes] === true) {
+    const diasUteis = getDiasUteisNoMes(dt13Ano, m.mes);
+    return { dias: diasUteis, contaAvo: true, manual: true };
+  }
+  return { dias: m.diasConsiderados, contaAvo: m.contaAvo, manual: false };
+}
+
+function toggleDt13Dia(mes, valor) {
+  if (valor === 'sim') dt13Overrides[mes] = true;
+  else if (valor === 'nao') delete dt13Overrides[mes]; // volta a usar os registros reais
+  renderDt13Mensal();
+  calcDecimoTerceiroBeta();
+}
+
 async function renderDecimoTerceiroBeta() {
   if (!isBeta13) return;
-  const ano = new Date().getFullYear();
-  document.getElementById('dt13-ano').value = ano;
-  document.getElementById('dt13-ano-tabela').textContent = ano;
-  const mesesEl = document.getElementById('dt13-meses');
-  if (mesesEl && !mesesEl.dataset.touched) mesesEl.value = new Date().getMonth() + 1;
-  document.getElementById('dt13-mensal-body').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>';
-  dt13MesesDetalhe = await calcDetalhamentoMensalAno(ano);
+  dt13Ano = new Date().getFullYear();
+  dt13Overrides = {};
+  document.getElementById('dt13-ano').value = dt13Ano;
+  document.getElementById('dt13-ano-tabela').textContent = dt13Ano;
+  document.getElementById('dt13-mensal-body').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>';
+  dt13MesesDetalhe = await calcDetalhamentoMensalAno(dt13Ano);
   renderDt13Mensal();
   calcDecimoTerceiroBeta();
 }
 
 function renderDt13Mensal() {
-  document.getElementById('dt13-mensal-body').innerHTML = dt13MesesDetalhe.map(m => `
-    <tr class="${m.contaAvo ? 'avo-sim' : ''}">
+  document.getElementById('dt13-mensal-body').innerHTML = dt13MesesDetalhe.map(m => {
+    const ef = dt13Efetivo(m);
+    const avoLabel = ef.contaAvo
+      ? `<span class="dt13-avo-badge sim">1/12 ✓${ef.manual ? ` (${ef.dias}d)` : ''}</span>`
+      : '<span class="dt13-avo-badge nao">—</span>';
+    return `
+    <tr class="${ef.contaAvo ? 'avo-sim' : ''}">
       <td>${m.nome}</td>
       <td class="num">${m.diasConsiderados}</td>
       <td class="num">${formatHoras(m.he50h)}</td>
       <td class="num">${formatHoras(m.he100h)}</td>
       <td class="num">${formatHoras(m.noturnasH)}</td>
-      <td>${m.contaAvo ? '<span class="dt13-avo-badge sim">1/12 ✓</span>' : '<span class="dt13-avo-badge nao">—</span>'}</td>
-    </tr>`).join('');
+      <td>
+        <select class="dt13-dia-select" onchange="toggleDt13Dia(${m.mes}, this.value)">
+          <option value="nao" ${!dt13Overrides[m.mes] ? 'selected' : ''}>Não</option>
+          <option value="sim" ${dt13Overrides[m.mes] ? 'selected' : ''}>Sim</option>
+        </select>
+      </td>
+      <td>${avoLabel}</td>
+    </tr>`;
+  }).join('');
 }
 
 function calcDecimoTerceiroBeta() {
   if (!isBeta13) return;
-  const mesesEl = document.getElementById('dt13-meses');
-  if (!mesesEl) return;
-  const meses = Math.max(0, Math.min(12, +mesesEl.value || 0));
-  document.getElementById('dt13-meses-val').textContent = meses + (meses === 1 ? ' mês' : ' meses');
-  const ano = new Date().getFullYear();
+  const ano = dt13Ano;
   const salOverride = document.getElementById('dt13-salario-override').value;
   const salBase = salOverride ? +salOverride : (perfil.salario_base || 0);
-  const chMensal = perfil.carga_horaria_mensal || 220;
 
   const valorVariavelAno = dt13MesesDetalhe.reduce((s, m) => s + m.valorVariavel, 0);
   const he50hAno = dt13MesesDetalhe.reduce((s, m) => s + m.he50h, 0);
   const he100hAno = dt13MesesDetalhe.reduce((s, m) => s + m.he100h, 0);
   const noturnasHAno = dt13MesesDetalhe.reduce((s, m) => s + m.noturnasH, 0);
+  const meses = dt13MesesDetalhe.reduce((s, m) => s + (dt13Efetivo(m).contaAvo ? 1 : 0), 0);
+  document.getElementById('dt13-meses-computados').textContent = `${meses} de 12`;
 
   const decimoTerceiroBase = salBase / 12 * meses;
   const decimoTerceiroVariavel = valorVariavelAno / 12;
@@ -3314,14 +3367,34 @@ function calcDecimoTerceiroBeta() {
   const inssValor = inssAtivo ? inssInfo.total : 0;
   const irrfValor = irrfAtivo ? irrfInfo.valor : 0;
 
+  // Outros descontos configurados (opcionais, escolhidos pelo usuário nesta página)
+  const incluirSaude = document.getElementById('dt13-desc-saude').checked;
+  const incluirExtras = document.getElementById('dt13-desc-extras').checked;
+  const incluirVT = document.getElementById('dt13-desc-vt').checked;
+  const incluirVR = document.getElementById('dt13-desc-vr').checked;
+
+  const planoSaude13 = (incluirSaude && configDescontos.plano_saude_ativo) ? (configDescontos.plano_saude_valor || 0) : 0;
+  const vt13 = (incluirVT && configDescontos.vt_ativo) ? decimoTerceiro * ((configDescontos.vt_valor || 0) / 100) : 0;
+  const vr13 = (incluirVR && configDescontos.vr_ativo) ? (configDescontos.vr_valor || 0) : 0;
+  let extras13 = 0;
+  const extrasDetalhe13 = incluirExtras ? descontosExtras.filter(d => d.ativo).map(d => {
+    const v = d.tipo === 'percentual' ? decimoTerceiro * (d.valor / 100) : d.valor;
+    extras13 += v;
+    return { nome: d.nome, valor: v };
+  }) : [];
+  const outrosTotal = planoSaude13 + vt13 + vr13 + extras13;
+
+  document.getElementById('dt13-desc-saude-info').textContent = configDescontos.plano_saude_ativo && configDescontos.plano_saude_valor ? fmtBRL(configDescontos.plano_saude_valor) + '/mês' : 'não configurado';
+  document.getElementById('dt13-desc-extras-info').textContent = descontosExtras.filter(d => d.ativo).length ? descontosExtras.filter(d => d.ativo).length + ' ativo(s)' : 'nenhum configurado';
+
   const parcela1 = decimoTerceiro / 2;
-  const parcela2 = Math.max(0, decimoTerceiro / 2 - inssValor - irrfValor);
-  const liquido = Math.max(0, decimoTerceiro - inssValor - irrfValor);
+  const parcela2 = Math.max(0, decimoTerceiro / 2 - inssValor - irrfValor - outrosTotal);
+  const liquido = Math.max(0, decimoTerceiro - inssValor - irrfValor - outrosTotal);
 
   // Memória de cálculo — passo a passo explicativo
   const passos = [
-    { t: `Salário base ÷ 12 × meses trabalhados`, f: `${fmtBRL(salBase)} ÷ 12 × ${meses} = ${fmtBRL(decimoTerceiroBase)}`,
-      d: `Essa é a parte "fixa" do seu 13º: cada mês trabalhado dá direito a 1/12 do salário contratual.` },
+    { t: `Salário base ÷ 12 × meses computados`, f: `${fmtBRL(salBase)} ÷ 12 × ${meses} = ${fmtBRL(decimoTerceiroBase)}`,
+      d: `Essa é a parte "fixa" do seu 13º: cada mês computado (≥15 dias trabalhados/abonados, ou marcado manualmente como "Sim" na tabela abaixo) dá direito a 1/12 do salário contratual.` },
     { t: `Média de horas extras + adicional noturno do ano ÷ 12`, f: `${fmtBRL(valorVariavelAno)} (total do ano) ÷ 12 = ${fmtBRL(decimoTerceiroVariavel)}`,
       d: `A lei manda incluir a média das verbas variáveis habituais no 13º. Somamos tudo que foi pago de HE 75%/100% e adicional noturno nos 12 meses (${formatHoras(he50hAno)} em HE 75%, ${formatHoras(he100hAno)} em HE 100%, ${formatHoras(noturnasHAno)} de noturno) e dividimos por 12.` },
     { t: `13º bruto = base + variáveis`, f: `${fmtBRL(decimoTerceiroBase)} + ${fmtBRL(decimoTerceiroVariavel)} = ${fmtBRL(decimoTerceiro)}`,
@@ -3330,10 +3403,12 @@ function calcDecimoTerceiroBeta() {
       d: `O INSS do 13º é calculado separadamente do salário mensal, usando a mesma tabela progressiva — veja o detalhamento por faixa mais abaixo.` },
     { t: `IRRF sobre o 13º`, f: irrfAtivo ? `tabela progressiva 2024 aplicada sobre (${fmtBRL(decimoTerceiro)} − ${fmtBRL(inssValor)}) = ${fmtBRL(irrfValor)}` : `desativado em Configurações`,
       d: `O IRRF também incide separadamente sobre o 13º, depois de descontar o INSS do próprio 13º.` },
+    { t: `Outros descontos configurados (opcional)`, f: outrosTotal > 0 ? `${fmtBRL(planoSaude13)} (plano) + ${fmtBRL(vt13)} (VT) + ${fmtBRL(vr13)} (VR) + ${fmtBRL(extras13)} (extras) = ${fmtBRL(outrosTotal)}` : 'nenhum ativado',
+      d: `Além de INSS/IRRF, você pode incluir aqui os mesmos descontos fixos configurados em Configurações (plano de saúde, VT, VR, empréstimos/extras). Ajuste os interruptores no card "Descontos sobre o 13º" acima.` },
     { t: `1ª parcela (sem descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 = ${fmtBRL(parcela1)}`,
-      d: `Metade do 13º bruto, paga como adiantamento — sem desconto de INSS/IRRF.` },
-    { t: `2ª parcela (com descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 − ${fmtBRL(inssValor)} − ${fmtBRL(irrfValor)} = ${fmtBRL(parcela2)}`,
-      d: `A outra metade, já com INSS e IRRF do 13º inteiro descontados aqui.` },
+      d: `Metade do 13º bruto, paga como adiantamento — sem nenhum desconto.` },
+    { t: `2ª parcela (com descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 − ${fmtBRL(inssValor)} − ${fmtBRL(irrfValor)} − ${fmtBRL(outrosTotal)} = ${fmtBRL(parcela2)}`,
+      d: `A outra metade, já com INSS, IRRF e os outros descontos ativados descontados aqui.` },
   ];
   document.getElementById('dt13-memoria').innerHTML = passos.map((p, i) => `
     <div class="ajuda-step">
@@ -3382,6 +3457,13 @@ function calcDecimoTerceiroBeta() {
   document.getElementById('dt13-bruto').textContent = fmtBRL(decimoTerceiro);
   document.getElementById('dt13-resumo-inss').textContent = '- ' + fmtBRL(inssValor);
   document.getElementById('dt13-resumo-irrf').textContent = '- ' + fmtBRL(irrfValor);
+  document.getElementById('dt13-resumo-outros-lista').innerHTML = [
+    ['Plano de Saúde', planoSaude13],
+    ['Vale Transporte', vt13],
+    ['Vale Refeição', vr13],
+    ...extrasDetalhe13.map(e => [e.nome, e.valor]),
+  ].filter(([, v]) => v > 0).map(([nome, v]) => `
+    <div class="sim-row"><div class="label">(−) ${escapeHtml(nome)}</div><div class="value negative">- ${fmtBRL(v)}</div></div>`).join('');
   document.getElementById('dt13-liquido').textContent = fmtBRL(liquido);
 }
 
