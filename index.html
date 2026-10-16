@@ -649,7 +649,6 @@
     </div>
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">Entrar</button>
-      <button class="auth-tab" onclick="switchTab('register')">Criar conta</button>
     </div>
     <!-- Login -->
     <div id="tab-login">
@@ -666,8 +665,9 @@
         <button onclick="switchTab('forgot')" style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;text-decoration:underline;font-family:inherit">Esqueci minha senha</button>
       </div>
       <div id="login-msg" class="auth-msg"></div>
+      <div style="margin-top:14px;font-size:12px;color:var(--text-dim);text-align:center"><i class="fas fa-lock"></i> Acesso restrito — novos cadastros estão desativados.</div>
     </div>
-    <!-- Register -->
+    <!-- Register (desativado: acesso restrito à conta master) -->
     <div id="tab-register" style="display:none">
       <div class="form-group">
         <label>Nome completo</label>
@@ -2069,7 +2069,8 @@ let db = createClient(
 // MODO DEMONSTRAÇÃO (?demo=1) — sem login, dados de exemplo em memória
 // Substitui o cliente Supabase por um mock; nada é enviado à rede.
 // ═══════════════════════════════════════════════════════════
-const DEMO = new URLSearchParams(location.search).get('demo') === '1' || location.hash === '#demo';
+// Desativado: o app está restrito à conta master (para reativar, volte a ler ?demo=1 / #demo da URL)
+const DEMO = false;
 const DEMO_USER = { id: 'demo-user-0001', email: 'demo@clockin.app' };
 
 function demoSeed() {
@@ -2216,6 +2217,18 @@ let configDescontos = {};
 let isAdmin = false;
 // Área Beta (13º Salário) — liberada somente para contas desta lista, enquanto em teste
 const BETA_13_EMAILS = ['khevenhenriquelimasantos443@gmail.com'];
+// Acesso restrito: só a conta master entra no app. Qualquer outra conta é desconectada na hora.
+const EMAILS_PERMITIDOS = ['khevenhenriquelimasantos443@gmail.com'];
+function acessoPermitido(user) { return !!(user && user.email && EMAILS_PERMITIDOS.includes(user.email.toLowerCase())); }
+async function bloquearAcesso() {
+  try { await db.auth.signOut(); } catch {}
+  currentUser = null;
+  showAuth();
+  switchTab('login');
+  const msg = document.getElementById('login-msg');
+  msg.textContent = 'Acesso restrito. Esta conta não tem permissão para usar o ClockIn.';
+  msg.className = 'auth-msg error';
+}
 let isBeta13 = false;
 let viewingAsUser = null; // { id, nome } quando admin visualiza outro usuário
 let _savedPerfil = null, _savedConfig = null, _savedExtras = null;
@@ -2244,7 +2257,9 @@ async function init() {
   startClocks();
   const { data: { session } } = await db.auth.getSession();
   hideLoader();
-  if (session) {
+  if (session && !acessoPermitido(session.user)) {
+    await bloquearAcesso();
+  } else if (session) {
     currentUser = session.user;
     await loadUserData();
     showApp();
@@ -2254,7 +2269,9 @@ async function init() {
   db.auth.onAuthStateChange(async (event, session) => {
     // O Supabase reemite SIGNED_IN ao voltar para a aba/renovar a sessão: só recarrega se mudou o usuário,
     // senão o app voltava sozinho para o Dashboard no meio do uso
-    if (event === 'SIGNED_IN' && session && (!currentUser || currentUser.id !== session.user.id)) {
+    if (event === 'SIGNED_IN' && session && !acessoPermitido(session.user)) {
+      await bloquearAcesso();
+    } else if (event === 'SIGNED_IN' && session && (!currentUser || currentUser.id !== session.user.id)) {
       currentUser = session.user;
       await loadUserData();
       showApp();
@@ -2352,6 +2369,7 @@ async function doForgotPassword() {
   const msg = document.getElementById('forgot-msg');
   msg.className = 'auth-msg';
   if (!email) { msg.textContent = 'Digite seu e-mail.'; msg.className = 'auth-msg error'; return; }
+  if (!EMAILS_PERMITIDOS.includes(email.toLowerCase())) { msg.textContent = 'Acesso restrito. Esta conta não tem permissão para usar o ClockIn.'; msg.className = 'auth-msg error'; return; }
   const { error } = await db.auth.resetPasswordForEmail(email, {
     redirectTo: window.location.href
   });
@@ -2366,6 +2384,7 @@ async function doLogin() {
   const msg = document.getElementById('login-msg');
   msg.className = 'auth-msg';
   if (!email || !password) { msg.textContent = 'Preencha e-mail e senha.'; msg.className = 'auth-msg error'; return; }
+  if (!EMAILS_PERMITIDOS.includes(email.toLowerCase())) { msg.textContent = 'Acesso restrito. Esta conta não tem permissão para usar o ClockIn.'; msg.className = 'auth-msg error'; return; }
   const { error } = await db.auth.signInWithPassword({ email, password });
   if (error) { msg.textContent = error.message; msg.className = 'auth-msg error'; }
 }
@@ -2376,6 +2395,7 @@ async function doRegister() {
   const password = document.getElementById('reg-password').value;
   const msg = document.getElementById('reg-msg');
   msg.className = 'auth-msg';
+  msg.textContent = 'Novos cadastros estão desativados.'; msg.className = 'auth-msg error'; return;
   if (!nome || !email || !password) { msg.textContent = 'Preencha todos os campos.'; msg.className = 'auth-msg error'; return; }
   if (password.length < 6) { msg.textContent = 'Senha deve ter mínimo 6 caracteres.'; msg.className = 'auth-msg error'; return; }
   const { error } = await db.auth.signUp({ email, password, options: { data: { nome } } });

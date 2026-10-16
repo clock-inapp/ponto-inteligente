@@ -1,4 +1,4 @@
-const VERSION = '1.21';
+const VERSION = '1.22';
 const CACHE = 'clockin-v' + VERSION;
 const ASSETS = ['./index.html', './icon.svg', './manifest.json', './'];
 
