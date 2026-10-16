@@ -1,4 +1,4 @@
 {
-  "version": "1.18",
-  "notes": "13º Beta: simulação do fim da 6x1 (EC 141/2026) com sábados como dia útil na 6x1, escala 5x2 42h/40h e valor-hora maior; horas extras podem ser preenchidas manualmente mês a mês; corrige rolagem lateral no celular"
+  "version": "1.19",
+  "notes": "13º Beta segue a regra de meses: jan–dez com mês atual e futuros projetados, média jan–nov ÷ 11 na 2ª parcela e revisão de janeiro com dezembro; prazos antecipados quando caem em fim de semana (2ª parcela 2026: 18/12)"
 }

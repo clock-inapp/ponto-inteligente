@@ -540,7 +540,7 @@
   .d13-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
     background: var(--primary-dim); color: var(--primary-light); border-radius: 6px; padding: 3px 8px; white-space: nowrap; }
   .d13-badge.alt { background: rgba(34,197,94,.15); color: var(--success); }
-  .d13-date { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+  .d13-date { font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 5px; min-width: 0; text-align: right; }
   .d13-date::before { content: "\f073"; font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 10px; }
   .d13-value { font-size: 22px; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
   .d13-note { font-size: 11px; color: var(--text-muted); }
@@ -1227,7 +1227,14 @@
               <li><strong style="color:var(--text)">Quem tem direito:</strong> todo empregado CLT que trabalhou pelo menos 15 dias em um mês — esse mês já conta como <strong>1 avo</strong> (1/12) do 13º.</li>
               <li><strong style="color:var(--text)">O que entra na conta:</strong> o salário base contratual, somado à <strong>média das verbas variáveis habituais</strong> recebidas ao longo do ano — no seu caso, horas extras (75%/100%) e adicional noturno. A lei não deixa de fora o que você ganhou de extra: ela manda tirar a média do ano.</li>
               <li><strong style="color:var(--text)">Como é pago:</strong> em até 2 parcelas. A 1ª não tem desconto (é um adiantamento). A 2ª parcela é quando o INSS e o IRRF são efetivamente descontados, sobre o valor total do 13º.</li>
-              <li><strong style="color:var(--text)">Prazos legais:</strong> 1ª parcela entre fevereiro e <strong>30 de novembro</strong>; 2ª parcela até <strong>20 de dezembro</strong>.</li>
+              <li><strong style="color:var(--text)">Prazos legais:</strong> 1ª parcela entre fevereiro e <strong>30 de novembro</strong>; 2ª parcela até <strong>20 de dezembro</strong>. Se o prazo cair em fim de semana, o pagamento é antecipado para o dia útil anterior (em 2026 o dia 20/12 é domingo, então a 2ª parcela vence em <strong>18/12</strong>).</li>
+            </ul>
+            <p style="margin:12px 0 6px"><strong style="color:var(--text)">Quais meses entram na conta?</strong></p>
+            <ul>
+              <li><strong style="color:var(--text)">De 1º de janeiro a 31 de dezembro do próprio ano.</strong> Dezembro do ano anterior já entrou no 13º do ano anterior — ele não é puxado de novo.</li>
+              <li><strong style="color:var(--text)">Dezembro é projetado:</strong> como a 2ª parcela é paga antes de dezembro acabar, o RH já conta dezembro como trabalhado. Aqui o app faz o mesmo: <strong>o mês atual e os seguintes entram como projetados</strong>; os meses que já passaram usam seus registros de ponto.</li>
+              <li><strong style="color:var(--text)">Horas extras de dezembro entram na revisão de janeiro:</strong> na 2ª parcela, a média das verbas variáveis usa só <strong>janeiro a novembro ÷ 11</strong>. Até <strong>10 de janeiro</strong> do ano seguinte, a empresa refaz a conta incluindo dezembro (<strong>ano todo ÷ 12</strong>) e paga ou desconta a diferença (Decreto 57.155/1965, art. 2º).</li>
+              <li><strong style="color:var(--text)">Valor das horas:</strong> a média é feita sobre a <strong>quantidade de horas</strong>, multiplicada pelo valor da hora <strong>na data do pagamento</strong> (Súmula 347 do TST) — não pelo valor que a hora tinha em cada mês.</li>
             </ul>
             <p style="margin-bottom:0">Esta página mostra, passo a passo, exatamente como o ClockIn chega no valor estimado do seu 13º — com os números reais dos seus registros de ponto deste ano.</p>
           </div>
@@ -1321,7 +1328,15 @@
                 <span class="d13-date" id="dt13-p2-data">até 20/12</span>
               </div>
               <div class="d13-value" id="dt13-p2-valor">R$ 0,00</div>
-              <div class="d13-note">50% menos INSS e IRRF (calculados sobre o 13º inteiro)</div>
+              <div class="d13-note">Restante, menos INSS e IRRF (calculados sobre o 13º inteiro). Média das variáveis: jan–nov ÷ 11</div>
+            </div>
+            <div class="d13-card">
+              <div class="d13-card-top">
+                <span class="d13-badge" style="background:rgba(167,139,250,.18);color:#a78bfa">Revisão</span>
+                <span class="d13-date" id="dt13-aj-data">até 10/01</span>
+              </div>
+              <div class="d13-value" id="dt13-aj-valor">R$ 0,00</div>
+              <div class="d13-note">Refaz a média incluindo dezembro (ano todo ÷ 12) e paga/desconta a diferença na folha de janeiro</div>
             </div>
           </div>
         </div>
@@ -1332,7 +1347,7 @@
             <span class="card-title"><i class="fas fa-calendar-alt" style="color:var(--info)"></i> Dias trabalhados mês a mês (<span id="dt13-ano-tabela"></span>)</span>
             <div style="display:flex;gap:6px">
               <button class="icon-btn" style="font-size:12px;padding:5px 10px" onclick="dt13MarcarTodos(true)"><i class="fas fa-check-double"></i> Todos "Sim"</button>
-              <button class="icon-btn" style="font-size:12px;padding:5px 10px" onclick="dt13MarcarTodos(false)"><i class="fas fa-rotate-left"></i> Limpar</button>
+              <button class="icon-btn" style="font-size:12px;padding:5px 10px" onclick="dt13MarcarTodos(false)"><i class="fas fa-rotate-left"></i> Padrão</button>
             </div>
           </div>
           <div class="dt13-table-wrap">
@@ -1348,7 +1363,7 @@
               </tbody>
             </table>
           </div>
-          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Por padrão, "Conta avo" usa os registros de ponto (≥ 15 dias com registro ou abonados no mês). Se um mês não tem registro mas você trabalhou normalmente (ex: antes de começar a usar o app, ou um mês futuro na simulação), marque <strong>"Sim"</strong> — o app passa a considerar todos os dias úteis daquele mês. <strong>Dias úteis</strong> seguem a escala do mês: na <strong>6x1 o sábado conta</strong> como dia útil (seg–sáb); na <strong>5x2</strong> só seg–sex. Domingos e feriados que você marcou no Histórico não contam. A regra legal exata também considera a data de admissão/demissão, que o app ainda não registra.</small>
+          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Período do 13º: <strong>janeiro a dezembro</strong> do ano escolhido. Por padrão, <strong>meses que já passaram</strong> usam os registros de ponto (≥ 15 dias com registro ou abonados = 1 avo) e o <strong>mês atual e os seguintes</strong> entram como <strong>projetados</strong>, como o RH faz ao pagar a 2ª parcela antes de dezembro acabar. Se um mês passado não tem registro mas você trabalhou normalmente (ex: antes de usar o app), marque <strong>"Sim"</strong>; se não vai trabalhar num mês futuro (ex: saída da empresa), marque <strong>"Não"</strong>. <strong>Dias úteis</strong> seguem a escala do mês: na <strong>6x1 o sábado conta</strong> como dia útil (seg–sáb); na <strong>5x2</strong> só seg–sex. Domingos e feriados que você marcou no Histórico não contam. A regra legal exata também considera a data de admissão/demissão, que o app ainda não registra.</small>
         </div>
 
         <!-- Horas extras mês a mês -->
@@ -1357,30 +1372,37 @@
             <span class="card-title"><i class="fas fa-stopwatch" style="color:var(--warning)"></i> Horas extras e noturno mês a mês (média do 13º)</span>
             <button class="icon-btn" style="font-size:12px;padding:5px 10px" onclick="dt13HETodosPonto()"><i class="fas fa-rotate-left"></i> Tudo do ponto</button>
           </div>
+          <div id="dt13-he-vh-info" style="font-size:12px;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:12px"></div>
           <div class="dt13-table-wrap">
             <table class="dt13-table">
               <thead>
                 <tr>
-                  <th>Mês</th><th>Escala</th><th>Origem</th><th class="num">HE 75%</th><th class="num">HE 100%</th>
-                  <th class="num">Noturno</th><th class="num">Valor-hora</th><th class="num">Valor no mês</th>
+                  <th>Mês</th><th>Origem</th><th class="num">HE 75%</th><th class="num">HE 100%</th>
+                  <th class="num">Noturno</th><th class="num">Valor</th>
                 </tr>
               </thead>
               <tbody id="dt13-he-body">
-                <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
+                <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-dim)">Carregando dados do ano...</td></tr>
               </tbody>
               <tfoot>
                 <tr>
-                  <td colspan="3" style="font-weight:700;color:var(--text)">Total do ano</td>
+                  <td colspan="2" style="font-weight:700;color:var(--text)">Jan–Nov <span style="font-weight:400;color:var(--text-dim)">(2ª parcela, ÷11)</span></td>
+                  <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-nov50">0h 00m</td>
+                  <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-nov100">0h 00m</td>
+                  <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-novnot">0h 00m</td>
+                  <td class="num" style="font-weight:700;color:var(--success)" id="dt13-he-novvalor">R$ 0,00</td>
+                </tr>
+                <tr>
+                  <td colspan="2" style="font-weight:700;color:var(--text)">Ano todo <span style="font-weight:400;color:var(--text-dim)">(revisão de janeiro, ÷12)</span></td>
                   <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-tot50">0h 00m</td>
                   <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-tot100">0h 00m</td>
                   <td class="num" style="font-weight:700;color:var(--text)" id="dt13-he-totnot">0h 00m</td>
-                  <td></td>
                   <td class="num" style="font-weight:700;color:var(--success)" id="dt13-he-totvalor">R$ 0,00</td>
                 </tr>
               </tfoot>
             </table>
           </div>
-          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Em <strong>"Do ponto"</strong>, as horas vêm dos seus registros (HE pela jornada diária configurada em Configurações; domingo = HE 100%). Troque para <strong>"Manual"</strong> para digitar você mesmo as horas daquele mês — aceita <code>40:30</code>, <code>40h30</code>, <code>40,5</code> ou <code>40</code>. Útil para meses sem registro, meses futuros na simulação ou para conferir com o que veio no holerite. Cada mês é valorizado com o valor-hora da escala daquele mês (salário ÷ divisor). Seus ajustes manuais ficam salvos neste navegador.</small>
+          <small style="color:var(--text-dim);font-size:11px;display:block;padding:10px 2px 0">* Em <strong>"Do ponto"</strong>, as horas vêm dos seus registros (HE pela jornada diária configurada em Configurações; domingo = HE 100%). Troque para <strong>"Manual"</strong> para digitar você mesmo as horas daquele mês — aceita <code>40:30</code>, <code>40h30</code>, <code>40,5</code> ou <code>40</code>. Útil para meses sem registro, para estimar <strong>novembro e dezembro</strong> antes de acontecerem, ou para conferir com o holerite. Seus ajustes manuais ficam salvos neste navegador.</small>
         </div>
 
         <!-- Descontos -->
@@ -1430,12 +1452,14 @@
           <div class="card-header">
             <span class="card-title"><i class="fas fa-receipt" style="color:var(--primary)"></i> Resumo final</span>
           </div>
-          <div class="sim-row"><div class="label">13º salário bruto (base + variáveis)</div><div class="value positive" id="dt13-bruto">R$ 0,00</div></div>
+          <div class="sim-row"><div class="label">13º bruto pago até dezembro (base + variáveis jan–nov)</div><div class="value positive" id="dt13-bruto">R$ 0,00</div></div>
           <div class="sim-row"><div class="label">(−) INSS</div><div class="value negative" id="dt13-resumo-inss">R$ 0,00</div></div>
           <div class="sim-row"><div class="label">(−) IRRF</div><div class="value negative" id="dt13-resumo-irrf">R$ 0,00</div></div>
           <div id="dt13-resumo-outros-lista"></div>
+          <div class="sim-row" style="font-weight:700"><div class="label">Líquido recebido (1ª + 2ª parcela)</div><div class="value" id="dt13-liquido-dez">R$ 0,00</div></div>
+          <div class="sim-row"><div class="label">Ajuste na revisão de janeiro (inclui dezembro, já com INSS/IRRF)</div><div class="value" id="dt13-ajuste-jan">R$ 0,00</div></div>
           <div class="sim-total mt-4">
-            <div class="label"><i class="fas fa-hand-holding-usd"></i> 13º Líquido Estimado</div>
+            <div class="label"><i class="fas fa-hand-holding-usd"></i> 13º Líquido do ano (após revisão)</div>
             <div class="value" id="dt13-liquido">R$ 0,00</div>
           </div>
           <div style="margin-top:12px;font-size:11px;color:var(--text-dim);text-align:center">
@@ -3297,6 +3321,17 @@ function scheduleReminders() {
 // ═══════════════════════════════════════════════════════════
 // 13º SALÁRIO E FÉRIAS (+1/3) — estimativa proporcional
 // ═══════════════════════════════════════════════════════════
+// Prazo legal do 13º; se cair em sábado/domingo, o pagamento é antecipado para a sexta anterior
+function prazo13(ano, mes, dia) {
+  const d = new Date(ano, mes - 1, dia);
+  const dow = d.getDay();
+  if (dow === 6) d.setDate(d.getDate() - 1);
+  if (dow === 0) d.setDate(d.getDate() - 2);
+  const fmt = x => `${String(x.getDate()).padStart(2, '0')}/${String(x.getMonth() + 1).padStart(2, '0')}/${x.getFullYear()}`;
+  const antecipado = dow === 0 || dow === 6;
+  return { data: d, texto: `até ${fmt(d)}` + (antecipado ? ` (${String(dia).padStart(2, '0')}/${String(mes).padStart(2, '0')} cai no ${dow === 0 ? 'domingo' : 'sábado'})` : '') };
+}
+
 function render13Ferias() {
   const mesesEl = document.getElementById('sim-meses-trab');
   if (!mesesEl) return;
@@ -3317,8 +3352,8 @@ function render13Ferias() {
   const irrf13 = calcIRRF(decimoTerceiro - inss13);
   const parcela2 = Math.max(0, decimoTerceiro / 2 - inss13 - irrf13);
   const ano = new Date().getFullYear();
-  document.getElementById('res-13-p1-data').textContent = `até 30/11/${ano}`;
-  document.getElementById('res-13-p2-data').textContent = `até 20/12/${ano}`;
+  document.getElementById('res-13-p1-data').textContent = prazo13(ano, 11, 30).texto;
+  document.getElementById('res-13-p2-data').textContent = prazo13(ano, 12, 20).texto;
   document.getElementById('res-13-p1').textContent = fmtBRL(parcela1);
   document.getElementById('res-13-p2').textContent = fmtBRL(parcela2);
 
@@ -3424,11 +3459,44 @@ function dt13DiasUteis(mes, regime) {
   return n;
 }
 
-// Dias/avo do mês já considerando a resposta manual "Trabalhou todos os dias?"
+// Mês atual e seguintes (ou um ano futuro inteiro) são projetados como trabalhados, como o RH faz
+// ao pagar a 2ª parcela antes de dezembro acabar. Meses que já passaram usam os registros de ponto.
+function dt13Projetado(mes) {
+  const hoje = new Date();
+  if (dt13Ano !== hoje.getFullYear()) return dt13Ano > hoje.getFullYear();
+  return mes >= hoje.getMonth() + 1;
+}
+
+// "Trabalhou todos os dias?" efetivo: override manual (true/false) ou, sem override, a projeção
+function dt13MesSim(mes) {
+  const ov = dt13Overrides[mes];
+  return ov === undefined ? dt13Projetado(mes) : ov === true;
+}
+
+// Dias/avo do mês já considerando a resposta "Trabalhou todos os dias?" (manual ou projetada)
 function dt13Efetivo(m) {
   const regime = dt13RegimeMes(m.mes);
-  if (dt13Overrides[m.mes]) return { regime, dias: dt13DiasUteis(m.mes, regime), contaAvo: true, manual: true };
-  return { regime, dias: m.diasConsiderados, contaAvo: m.contaAvo, manual: false };
+  if (dt13MesSim(m.mes)) {
+    const projetado = dt13Overrides[m.mes] === undefined;
+    return { regime, dias: dt13DiasUteis(m.mes, regime), contaAvo: true, manual: !projetado, projetado };
+  }
+  return { regime, dias: m.diasConsiderados, contaAvo: m.contaAvo, manual: false, projetado: false };
+}
+
+// Dezembro (que só entra na revisão de janeiro) ainda não aconteceu e não foi preenchido à mão:
+// projeta as horas dele pela média de jan–nov, para não gerar um ajuste negativo artificial
+function dt13DezProjetado() {
+  return !dt13HEOverrides[12] && dt13Ano >= new Date().getFullYear();
+}
+
+// Súmula 347 TST: as horas são valorizadas pelo salário-hora da época do pagamento — aqui, a data
+// de pagamento da 2ª parcela (no modo automático, a escala que vigora nesse dia)
+function dt13RegimePagamento() {
+  const escala = document.getElementById('dt13-escala').value || 'auto';
+  if (escala !== 'auto') return escala;
+  const { fase1, fase2 } = dt13Fases();
+  const pag = prazo13(dt13Ano, 12, 20).data;
+  return pag >= fase2 ? '5x2-40' : pag >= fase1 ? '5x2-42' : '6x1-44';
 }
 
 // Horas extras/noturno do mês: do ponto ou preenchidas manualmente
@@ -3443,9 +3511,9 @@ function dt13SalBase() {
   return v ? +v : (perfil.salario_base || 0);
 }
 
-// Valor das HE/noturno de um mês com o valor-hora da escala do mês (ou de uma escala forçada, p/ comparar)
+// Valor das HE/noturno de um mês com o valor-hora da data de pagamento (ou de uma escala forçada, p/ comparar)
 function dt13ValorMes(m, salBase, regimeForcado) {
-  const regime = regimeForcado || dt13RegimeMes(m.mes);
+  const regime = regimeForcado || dt13RegimePagamento();
   const div = dt13Divisor(regime);
   const vh = div > 0 ? salBase / div : 0;
   const he = dt13HEEfetivo(m);
@@ -3525,14 +3593,17 @@ function dt13Refresh() {
   calcDecimoTerceiroBeta();
 }
 
+// "Sim" = todos os dias úteis do mês; "Não" = pelo ponto. Só guarda o override quando difere do padrão
 function toggleDt13Dia(mes, valor) {
-  if (valor === 'sim') dt13Overrides[mes] = true;
-  else delete dt13Overrides[mes]; // volta a usar os registros reais
+  const sim = valor === 'sim';
+  if (sim === dt13Projetado(mes)) delete dt13Overrides[mes];
+  else dt13Overrides[mes] = sim;
   dt13SaveStore();
   renderDt13Mensal();
   calcDecimoTerceiroBeta();
 }
 
+// sim=true: todos os meses "Sim"; sim=false: volta ao padrão (passados pelo ponto, atual e futuros projetados)
 function dt13MarcarTodos(sim) {
   dt13Overrides = {};
   if (sim) for (let mi = 1; mi <= 12; mi++) dt13Overrides[mi] = true;
@@ -3544,9 +3615,9 @@ function dt13MarcarTodos(sim) {
 function renderDt13Mensal() {
   document.getElementById('dt13-mensal-body').innerHTML = dt13MesesDetalhe.map(m => {
     const ef = dt13Efetivo(m);
-    const avoLabel = ef.contaAvo
-      ? `<span class="dt13-avo-badge sim">1/12 ✓${ef.manual ? ` (${ef.dias}d)` : ''}</span>`
-      : '<span class="dt13-avo-badge nao">—</span>';
+    const avoLabel = !ef.contaAvo ? '<span class="dt13-avo-badge nao">—</span>'
+      : ef.projetado ? `<span class="dt13-avo-badge sim" style="background:rgba(167,139,250,.18);color:#a78bfa">1/12 ✓ projetado</span>`
+      : `<span class="dt13-avo-badge sim">1/12 ✓${ef.manual ? ` (${ef.dias}d)` : ''}</span>`;
     return `
     <tr class="${ef.contaAvo ? 'avo-sim' : ''}">
       <td>${m.nome}</td>
@@ -3555,8 +3626,8 @@ function renderDt13Mensal() {
       <td class="num">${dt13DiasUteis(m.mes, ef.regime)}</td>
       <td>
         <select class="dt13-dia-select" onchange="toggleDt13Dia(${m.mes}, this.value)">
-          <option value="nao" ${!dt13Overrides[m.mes] ? 'selected' : ''}>Não</option>
-          <option value="sim" ${dt13Overrides[m.mes] ? 'selected' : ''}>Sim</option>
+          <option value="nao" ${!dt13MesSim(m.mes) ? 'selected' : ''}>Não</option>
+          <option value="sim" ${dt13MesSim(m.mes) ? 'selected' : ''}>Sim</option>
         </select>
       </td>
       <td>${avoLabel}</td>
@@ -3609,23 +3680,31 @@ function renderDt13HE() {
     const cel = campo => manual
       ? `<input type="text" class="dt13-hora-input" value="${fmtHHMM(v.he[campo])}" placeholder="0:00" onchange="setDt13HE(${m.mes}, '${campo}', this)">`
       : formatHoras(v.he[campo]);
+    const dezProj = m.mes === 12 && dt13DezProjetado();
+    const notaDez = m.mes !== 12 ? ''
+      : `<div style="font-size:10px;color:#a78bfa">${dezProj ? 'projetado pela média jan–nov · ' : ''}entra só na revisão de janeiro</div>`;
+    const horas = campo => dezProj ? '<span style="color:var(--text-dim)">média</span>' : cel(campo);
     return `
     <tr class="${manual ? 'avo-sim' : ''}">
-      <td>${m.nome}</td>
-      <td><span class="dt13-regime-badge r-${v.regime}">${DT13_REGIMES[v.regime].label}</span></td>
+      <td>${m.nome}${notaDez}</td>
       <td>
         <select class="dt13-dia-select" onchange="toggleDt13HEManual(${m.mes}, this.value)">
-          <option value="ponto" ${!manual ? 'selected' : ''}>Do ponto</option>
+          <option value="ponto" ${!manual ? 'selected' : ''}>${dezProj ? 'Projetado' : 'Do ponto'}</option>
           <option value="manual" ${manual ? 'selected' : ''}>Manual</option>
         </select>
       </td>
-      <td class="num">${cel('he50h')}</td>
-      <td class="num">${cel('he100h')}</td>
-      <td class="num">${cel('noturnasH')}</td>
-      <td class="num">${fmtBRL(v.vh)} <span style="color:var(--text-dim)">÷${v.div}</span></td>
+      <td class="num">${horas('he50h')}</td>
+      <td class="num">${horas('he100h')}</td>
+      <td class="num">${horas('noturnasH')}</td>
       <td class="num" id="dt13-he-valor-${m.mes}">${fmtBRL(v.valor)}</td>
     </tr>`;
   }).join('');
+  const reg = dt13RegimePagamento();
+  const div = dt13Divisor(reg);
+  document.getElementById('dt13-he-vh-info').innerHTML =
+    `<i class="fas fa-circle-info" style="color:var(--info)"></i> Valor-hora usado em todos os meses: <strong style="color:var(--text)">${fmtBRL(div > 0 ? salBase / div : 0)}</strong> ` +
+    `(salário ÷ ${div}, escala ${DT13_REGIMES[reg].label} vigente na data de pagamento, ${prazo13(dt13Ano, 12, 20).texto.replace('até ', '')}). ` +
+    `Pela Súmula 347 do TST, a média é feita sobre a <strong style="color:var(--text)">quantidade de horas</strong> e valorizada pelo salário-hora da época do pagamento.`;
 }
 
 // Datas das etapas da EC e comparação do 13º com as mesmas HE em cada escala
@@ -3634,13 +3713,15 @@ function dt13RenderEscalaInfo(salBase, decimoTerceiroBase) {
   const fd = d => d.toLocaleDateString('pt-BR');
   const escala = document.getElementById('dt13-escala').value || 'auto';
   const regimesNoAno = [...new Set(dt13MesesDetalhe.map(m => dt13RegimeMes(m.mes)))];
+  const regPag = dt13RegimePagamento();
   document.getElementById('dt13-fases-info').innerHTML =
     `<i class="fas fa-calendar-day"></i> Promulgação: <strong>${fd(prom)}</strong> · 1ª etapa (42h + 2 folgas): <strong>${fd(fase1)}</strong> · 2ª etapa (40h): <strong>${fd(fase2)}</strong>. ` +
     (escala === 'auto'
-      ? `Em ${dt13Ano}, o cálculo usa: ${regimesNoAno.map(r => DT13_REGIMES[r].nome).join(' → ')} (cada mês na escala que vigora na maior parte dos dias).`
+      ? `Em ${dt13Ano}, os dias úteis seguem: ${regimesNoAno.map(r => DT13_REGIMES[r].nome).join(' → ')} (cada mês na escala da maior parte dos dias); as horas extras usam o valor-hora da escala vigente no pagamento da 2ª parcela: <strong>${DT13_REGIMES[regPag].nome}</strong>.`
       : `Escala fixa escolhida para o ano inteiro.`) +
     ` <span style="color:var(--text-dim)">Confira a data oficial de publicação no Diário Oficial; se for diferente, ajuste a data acima.</span>`;
 
+  // Comparação: 13º do ano (após a revisão de janeiro) se o pagamento já fosse em cada escala
   const comp = Object.keys(DT13_REGIMES).map(r => {
     const div = dt13Divisor(r);
     const variavel = dt13MesesDetalhe.reduce((s, m) => s + dt13ValorMes(m, salBase, r).valor, 0) / 12;
@@ -3650,10 +3731,10 @@ function dt13RenderEscalaInfo(salBase, decimoTerceiroBase) {
   document.getElementById('dt13-comp-regimes').innerHTML = comp.map(c => {
     const pct = ref.vh > 0 ? (c.vh / ref.vh - 1) * 100 : 0;
     return `
-    <div class="dt13-comp-card${escala === c.r ? ' ativo' : ''}">
-      <div class="c-tit">${DT13_REGIMES[c.r].nome}</div>
+    <div class="dt13-comp-card${regPag === c.r ? ' ativo' : ''}">
+      <div class="c-tit">${DT13_REGIMES[c.r].nome}${regPag === c.r ? ' · em uso' : ''}</div>
       <div class="c-val">${fmtBRL(c.total)}</div>
-      <div class="c-sub">13º bruto estimado<br>Valor-hora ${fmtBRL(c.vh)} (÷${c.div})${pct > 0.05 ? ` · <span style="color:var(--success)">+${pct.toFixed(1).replace('.', ',')}%</span>` : ''}</div>
+      <div class="c-sub">13º bruto do ano (após revisão)<br>Valor-hora ${fmtBRL(c.vh)} (÷${c.div})${pct > 0.05 ? ` · <span style="color:var(--success)">+${pct.toFixed(1).replace('.', ',')}%</span>` : ''}</div>
     </div>`;
   }).join('');
 }
@@ -3662,67 +3743,97 @@ function calcDecimoTerceiroBeta() {
   if (!isBeta13) return;
   const ano = dt13Ano;
   const salBase = dt13SalBase();
+  const soma = (arr, f) => arr.reduce((s, x) => s + f(x), 0);
+  const sinal = v => (v >= 0 ? '+ ' : '− ') + fmtBRL(Math.abs(v));
 
+  // Horas do ano valorizadas pelo salário-hora da data de pagamento (Súmula 347 TST)
   const valores = dt13MesesDetalhe.map(m => dt13ValorMes(m, salBase));
-  const valorVariavelAno = valores.reduce((s, v) => s + v.valor, 0);
-  const he50hAno = valores.reduce((s, v) => s + v.he.he50h, 0);
-  const he100hAno = valores.reduce((s, v) => s + v.he.he100h, 0);
-  const noturnasHAno = valores.reduce((s, v) => s + v.he.noturnasH, 0);
+  const valoresNov = valores.slice(0, 11); // jan–nov: base da média paga em dezembro
+  const vh = valores.length ? valores[0].vh : 0;
+  const div = valores.length ? valores[0].div : 0;
+  const regPag = dt13RegimePagamento();
+  const tot = arr => ({ he50: soma(arr, v => v.he.he50h), he100: soma(arr, v => v.he.he100h), not: soma(arr, v => v.he.noturnasH), valor: soma(arr, v => v.valor) });
+  const totNov = tot(valoresNov);
+  const dezProj = dt13DezProjetado();
+  const valorDezProj = totNov.valor / 11;
+  const totAno = dezProj
+    ? { he50: totNov.he50 * 12 / 11, he100: totNov.he100 * 12 / 11, not: totNov.not * 12 / 11, valor: totNov.valor + valorDezProj }
+    : tot(valores);
+  if (dezProj) document.getElementById('dt13-he-valor-12').textContent = '≈ ' + fmtBRL(valorDezProj);
   const nManualHE = valores.filter(v => v.he.manual).length;
-  const divisoresUsados = [...new Map(valores.map(v => [v.regime, v.div])).entries()]
-    .map(([r, d]) => `${DT13_REGIMES[r].label} ÷${d}`).join(', ');
-  const meses = dt13MesesDetalhe.reduce((s, m) => s + (dt13Efetivo(m).contaAvo ? 1 : 0), 0);
-  document.getElementById('dt13-meses-computados').textContent = `${meses} de 12`;
-  document.getElementById('dt13-he-tot50').textContent = formatHoras(he50hAno);
-  document.getElementById('dt13-he-tot100').textContent = formatHoras(he100hAno);
-  document.getElementById('dt13-he-totnot').textContent = formatHoras(noturnasHAno);
-  document.getElementById('dt13-he-totvalor').textContent = fmtBRL(valorVariavelAno);
 
+  const efetivos = dt13MesesDetalhe.map(m => dt13Efetivo(m));
+  const meses = efetivos.filter(e => e.contaAvo).length;
+  const nProjetados = efetivos.filter(e => e.projetado).length;
+  document.getElementById('dt13-meses-computados').textContent = `${meses} de 12` + (nProjetados ? ` (${nProjetados} projetado${nProjetados > 1 ? 's' : ''})` : '');
+  [['nov', totNov], ['tot', totAno]].forEach(([k, t]) => {
+    document.getElementById(`dt13-he-${k}50`).textContent = formatHoras(t.he50);
+    document.getElementById(`dt13-he-${k}100`).textContent = formatHoras(t.he100);
+    document.getElementById(`dt13-he-${k}not`).textContent = formatHoras(t.not);
+    document.getElementById(`dt13-he-${k}valor`).textContent = fmtBRL(t.valor);
+  });
+
+  // Decreto 57.155/1965, art. 2º: em dezembro, variáveis = soma jan–nov ÷ 11;
+  // até 10/jan, revisão com dezembro = soma do ano ÷ 12, pagando/descontando a diferença
   const decimoTerceiroBase = salBase / 12 * meses;
-  const decimoTerceiroVariavel = valorVariavelAno / 12;
-  const decimoTerceiro = decimoTerceiroBase + decimoTerceiroVariavel;
+  const varDez = totNov.valor / 11;
+  const varAno = totAno.valor / 12;
+  const brutoDez = decimoTerceiroBase + varDez;
+  const brutoAno = decimoTerceiroBase + varAno;
   dt13RenderEscalaInfo(salBase, decimoTerceiroBase);
 
-  const inssInfo = calcINSSDetalhado(decimoTerceiro);
-  const irrfInfo = calcIRRFDetalhado(decimoTerceiro - inssInfo.total);
   const inssAtivo = configDescontos.inss_ativo !== false;
   const irrfAtivo = configDescontos.irrf_ativo !== false;
-  const inssValor = inssAtivo ? inssInfo.total : 0;
-  const irrfValor = irrfAtivo ? irrfInfo.valor : 0;
-
   // Outros descontos — SOMENTE os que a lei realmente permite incidir sobre o 13º.
   // VT, VR e empréstimo consignado NÃO entram aqui: são vedados por lei/eSocial sobre o 13º.
   const incluirPensao = document.getElementById('dt13-desc-pensao').checked;
   const pensaoPct = +document.getElementById('dt13-pensao-pct').value || 0;
-  const pensao13 = incluirPensao ? decimoTerceiro * (pensaoPct / 100) : 0;
-
   const incluirSaude = document.getElementById('dt13-desc-saude').checked; // exceção rara — desligado por padrão
   const planoSaude13 = (incluirSaude && configDescontos.plano_saude_ativo) ? (configDescontos.plano_saude_valor || 0) : 0;
+  // INSS/IRRF/pensão sobre o 13º inteiro; o plano de saúde (valor fixo) é descontado uma vez só
+  const descontos = bruto => {
+    const inssInfo = calcINSSDetalhado(bruto);
+    const inss = inssAtivo ? inssInfo.total : 0;
+    const irrfInfo = calcIRRFDetalhado(bruto - inss);
+    const irrf = irrfAtivo ? irrfInfo.valor : 0;
+    const pensao = incluirPensao ? bruto * (pensaoPct / 100) : 0;
+    const outros = pensao + planoSaude13;
+    return { inssInfo, irrfInfo, inss, irrf, pensao, outros, liquido: Math.max(0, bruto - inss - irrf - outros) };
+  };
+  const dDez = descontos(brutoDez);
+  const dAno = descontos(brutoAno);
+  const inssInfo = dDez.inssInfo, irrfInfo = dDez.irrfInfo;
+  const inssValor = dDez.inss, irrfValor = dDez.irrf, pensao13 = dDez.pensao, outrosTotal = dDez.outros;
 
-  const outrosTotal = pensao13 + planoSaude13;
-
-  const parcela1 = decimoTerceiro / 2;
-  const parcela2 = Math.max(0, decimoTerceiro / 2 - inssValor - irrfValor - outrosTotal);
-  const liquido = Math.max(0, decimoTerceiro - inssValor - irrfValor - outrosTotal);
+  const parcela1 = brutoDez / 2;
+  const parcela2 = Math.max(0, dDez.liquido - parcela1);
+  const ajusteBruto = brutoAno - brutoDez;
+  const ajusteLiquido = dAno.liquido - dDez.liquido;
+  const prazoAjuste = prazo13(ano + 1, 1, 10);
+  const horasTxt = t => `${formatHoras(t.he50)} HE 75% + ${formatHoras(t.he100)} HE 100% + ${formatHoras(t.not)} noturno`;
+  const hojeMes = new Date().getFullYear() === ano ? new Date().getMonth() + 1 : (ano > new Date().getFullYear() ? 0 : 13);
+  const mesesFuturosNov = Math.max(0, 11 - Math.max(hojeMes, 1) + 1);
 
   // Memória de cálculo — passo a passo explicativo
   const passos = [
-    { t: `Salário base ÷ 12 × meses computados`, f: `${fmtBRL(salBase)} ÷ 12 × ${meses} = ${fmtBRL(decimoTerceiroBase)}`,
-      d: `Essa é a parte "fixa" do seu 13º: cada mês computado (≥15 dias trabalhados/abonados, ou marcado manualmente como "Sim" na tabela de dias) dá direito a 1/12 do salário contratual. A troca de escala não muda essa parte — a emenda proíbe reduzir o salário.` },
-    { t: `Média de horas extras + adicional noturno do ano ÷ 12`, f: `${fmtBRL(valorVariavelAno)} (total do ano) ÷ 12 = ${fmtBRL(decimoTerceiroVariavel)}`,
-      d: `A lei manda incluir a média das verbas variáveis habituais no 13º. Somamos HE 75%/100% e adicional noturno dos 12 meses (${formatHoras(he50hAno)} em HE 75%, ${formatHoras(he100hAno)} em HE 100%, ${formatHoras(noturnasHAno)} de noturno) e dividimos por 12. Cada mês é valorizado com o valor-hora da escala daquele mês (salário ÷ divisor: ${divisoresUsados || '—'}) — com o fim da 6x1 o divisor cai e a mesma hora extra passa a valer mais.${nManualHE ? ` ${nManualHE} ${nManualHE === 1 ? 'mês com horas preenchidas' : 'meses com horas preenchidas'} manualmente.` : ''}` },
-    { t: `13º bruto = base + variáveis`, f: `${fmtBRL(decimoTerceiroBase)} + ${fmtBRL(decimoTerceiroVariavel)} = ${fmtBRL(decimoTerceiro)}`,
-      d: `Esse é o valor total do seu 13º salário antes de qualquer desconto.` },
-    { t: `INSS sobre o 13º`, f: inssAtivo ? `tabela progressiva 2024 aplicada sobre ${fmtBRL(decimoTerceiro)} = ${fmtBRL(inssValor)}` : `desativado em Configurações`,
+    { t: `Meses do 13º (jan–dez/${ano}) e parte fixa`, f: `${fmtBRL(salBase)} ÷ 12 × ${meses} = ${fmtBRL(decimoTerceiroBase)}`,
+      d: `O período é de 1º de janeiro a 31 de dezembro de ${ano} — dezembro do ano anterior já entrou no 13º anterior. Cada mês com 15 dias ou mais trabalhados conta 1/12 (avo). Meses que já passaram usam o ponto${nProjetados ? `; ${nProjetados} ${nProjetados === 1 ? 'mês entra projetado' : 'meses entram projetados'} como trabalhado${nProjetados === 1 ? '' : 's'} (o atual e os seguintes), como o RH faz ao pagar antes de dezembro acabar` : ''}. A troca de escala não muda essa parte — a emenda proíbe reduzir o salário.` },
+    { t: `Média das horas extras e noturno: janeiro a novembro ÷ 11`, f: `${horasTxt(totNov)} × valor-hora ${fmtBRL(vh)} = ${fmtBRL(totNov.valor)} ÷ 11 = ${fmtBRL(varDez)}`,
+      d: `Dezembro ainda não terminou quando a 2ª parcela é paga, então a média das verbas variáveis usa só janeiro a novembro, dividida por 11 (Decreto 57.155/1965, art. 2º). As horas são valorizadas pelo salário-hora da data do pagamento — ${fmtBRL(vh)} = salário ÷ ${div} (${DT13_REGIMES[regPag].nome}) — conforme a Súmula 347 do TST.${mesesFuturosNov > 0 ? ` Meses até novembro que ainda não aconteceram entram com as horas que você preencher em "Manual" (ou 0h).` : ''}${nManualHE ? ` ${nManualHE} ${nManualHE === 1 ? 'mês com horas preenchidas' : 'meses com horas preenchidas'} manualmente.` : ''}` },
+    { t: `13º bruto pago até dezembro = parte fixa + variáveis`, f: `${fmtBRL(decimoTerceiroBase)} + ${fmtBRL(varDez)} = ${fmtBRL(brutoDez)}`,
+      d: `É o valor que a empresa paga somando as duas parcelas, antes dos descontos.` },
+    { t: `INSS sobre o 13º`, f: inssAtivo ? `tabela progressiva 2024 aplicada sobre ${fmtBRL(brutoDez)} = ${fmtBRL(inssValor)}` : `desativado em Configurações`,
       d: `O INSS do 13º é calculado separadamente do salário mensal, usando a mesma tabela progressiva — veja o detalhamento por faixa mais abaixo.` },
-    { t: `IRRF sobre o 13º`, f: irrfAtivo ? `tabela progressiva 2024 aplicada sobre (${fmtBRL(decimoTerceiro)} − ${fmtBRL(inssValor)}) = ${fmtBRL(irrfValor)}` : `desativado em Configurações`,
+    { t: `IRRF sobre o 13º`, f: irrfAtivo ? `tabela progressiva 2024 aplicada sobre (${fmtBRL(brutoDez)} − ${fmtBRL(inssValor)}) = ${fmtBRL(irrfValor)}` : `desativado em Configurações`,
       d: `O IRRF também incide separadamente sobre o 13º, depois de descontar o INSS do próprio 13º.` },
     { t: `Pensão alimentícia / plano de saúde (se aplicável)`, f: outrosTotal > 0 ? `${fmtBRL(pensao13)} (pensão) + ${fmtBRL(planoSaude13)} (plano de saúde) = ${fmtBRL(outrosTotal)}` : 'nenhum ativado',
       d: `Diferente do salário mensal, o 13º tem descontos bem restritos por lei. Vale-transporte, vale-refeição/alimentação e parcelas de empréstimo consignado NÃO podem ser descontados do 13º (o próprio eSocial bloqueia esse lançamento) — por isso nem aparecem como opção aqui. Só incluímos pensão alimentícia (com determinação judicial) e plano de saúde (exceção rara, só com previsão em convenção coletiva ou autorização sua expressa).` },
-    { t: `1ª parcela (sem descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 = ${fmtBRL(parcela1)}`,
+    { t: `1ª parcela (sem descontos)`, f: `${fmtBRL(brutoDez)} ÷ 2 = ${fmtBRL(parcela1)}`,
       d: `Metade do 13º bruto, paga como adiantamento — sem nenhum desconto.` },
-    { t: `2ª parcela (com descontos)`, f: `${fmtBRL(decimoTerceiro)} ÷ 2 − ${fmtBRL(inssValor)} − ${fmtBRL(irrfValor)} − ${fmtBRL(outrosTotal)} = ${fmtBRL(parcela2)}`,
-      d: `A outra metade, já com INSS, IRRF e (se ativados) pensão alimentícia/plano de saúde descontados aqui.` },
+    { t: `2ª parcela (com descontos)`, f: `${fmtBRL(brutoDez)} − ${fmtBRL(parcela1)} − ${fmtBRL(inssValor)} − ${fmtBRL(irrfValor)} − ${fmtBRL(outrosTotal)} = ${fmtBRL(parcela2)}`,
+      d: `O restante, já com INSS, IRRF e (se ativados) pensão alimentícia/plano de saúde descontados aqui.` },
+    { t: `Revisão ${prazoAjuste.texto} — inclui dezembro`, f: `${fmtBRL(totAno.valor)} (ano todo) ÷ 12 = ${fmtBRL(varAno)} → 13º bruto ${fmtBRL(brutoAno)} → ajuste ${sinal(ajusteBruto)} bruto (${sinal(ajusteLiquido)} líquido)`,
+      d: `Com dezembro encerrado, a empresa refaz a média das variáveis como 1/12 do total do ano (agora com as horas de dezembro) e paga a diferença na folha de janeiro — ou desconta, se a média caiu. INSS e IRRF são recalculados sobre o 13º total.${dezProj ? ' Como dezembro ainda não aconteceu, as horas dele foram projetadas pela média de janeiro a novembro — por isso o ajuste fica perto de zero. Preencha dezembro em "Manual" na tabela de horas para simular um mês mais forte ou mais fraco.' : ''}` },
   ];
   document.getElementById('dt13-memoria').innerHTML = passos.map((p, i) => `
     <div class="ajuda-step">
@@ -3733,11 +3844,15 @@ function calcDecimoTerceiroBeta() {
       </div>
     </div>`).join('');
 
-  // Parcelas
-  document.getElementById('dt13-p1-data').textContent = `até 30/11/${ano}`;
-  document.getElementById('dt13-p2-data').textContent = `até 20/12/${ano}`;
+  // Parcelas (prazo antecipado quando cai em fim de semana)
+  document.getElementById('dt13-p1-data').textContent = prazo13(ano, 11, 30).texto;
+  document.getElementById('dt13-p2-data').textContent = prazo13(ano, 12, 20).texto;
   document.getElementById('dt13-p1-valor').textContent = fmtBRL(parcela1);
   document.getElementById('dt13-p2-valor').textContent = fmtBRL(parcela2);
+  document.getElementById('dt13-aj-data').textContent = prazoAjuste.texto;
+  const ajEl = document.getElementById('dt13-aj-valor');
+  ajEl.textContent = sinal(ajusteLiquido);
+  ajEl.style.color = ajusteLiquido > 0.004 ? 'var(--success)' : ajusteLiquido < -0.004 ? 'var(--danger)' : '';
 
   // INSS por faixa
   if (!inssAtivo) {
@@ -3768,7 +3883,7 @@ function calcDecimoTerceiroBeta() {
   }
 
   // Resumo final
-  document.getElementById('dt13-bruto').textContent = fmtBRL(decimoTerceiro);
+  document.getElementById('dt13-bruto').textContent = fmtBRL(brutoDez);
   document.getElementById('dt13-resumo-inss').textContent = '- ' + fmtBRL(inssValor);
   document.getElementById('dt13-resumo-irrf').textContent = '- ' + fmtBRL(irrfValor);
   document.getElementById('dt13-resumo-outros-lista').innerHTML = [
@@ -3776,7 +3891,11 @@ function calcDecimoTerceiroBeta() {
     ['Plano de Saúde', planoSaude13],
   ].filter(([, v]) => v > 0).map(([nome, v]) => `
     <div class="sim-row"><div class="label">(−) ${escapeHtml(nome)}</div><div class="value negative">- ${fmtBRL(v)}</div></div>`).join('');
-  document.getElementById('dt13-liquido').textContent = fmtBRL(liquido);
+  document.getElementById('dt13-liquido-dez').textContent = fmtBRL(dDez.liquido);
+  const ajResumo = document.getElementById('dt13-ajuste-jan');
+  ajResumo.textContent = sinal(ajusteLiquido);
+  ajResumo.className = 'value' + (ajusteLiquido > 0.004 ? ' positive' : ajusteLiquido < -0.004 ? ' negative' : '');
+  document.getElementById('dt13-liquido').textContent = fmtBRL(dAno.liquido);
 }
 
 // ═══════════════════════════════════════════════════════════
